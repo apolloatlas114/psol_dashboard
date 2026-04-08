@@ -1,0 +1,19 @@
+{
+  "name": "playsol-dashboard",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "web",
+    "api"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --workspace web run dev\" \"npm --workspace api run dev\"",
+    "dev:web": "npm --workspace web run dev",
+    "dev:api": "npm --workspace api run dev",
+    "build": "npm --workspace web run build && npm --workspace api run check",
+    "check": "npm --workspace api run check"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

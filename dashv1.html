@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PLAYSOL Dashboard Reference-Matched Prototype</title>
+  <!--
+    Codex asset setup:
+    ./assets/playsol-logo.png
+    ./assets/realmonster.png
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --logo: url("./assets/playsol-logo.png");
+      --monster: url("./assets/realmonster.png");
+      --bg-1: #05020a;
+      --bg-2: #120727;
+      --bg-3: #26136b;
+      --panel: #180a30;
+      --panel-2: #12071f;
+      --panel-3: #1d0f42;
+      --stroke: rgba(112, 86, 255, 0.18);
+      --stroke-soft: rgba(255,255,255,0.07);
+      --text: #f6f4ff;
+      --muted: #8f99cc;
+      --cyan: #63e8ff;
+      --blue: #6b7cff;
+      --pink: #ff56b7;
+      --green: #49e56f;
+      --yellow: #f4e8b3;
+      --shadow-shell: 0 32px 90px rgba(0,0,0,0.44);
+      --shadow-card: 0 18px 34px rgba(0,0,0,0.24);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,84,183,0.08), transparent 20%),
+        radial-gradient(circle at 90% 10%, rgba(99,232,255,0.10), transparent 18%),
+        linear-gradient(180deg, var(--bg-1) 0%, #090312 30%, var(--bg-2) 70%, var(--bg-3) 100%);
+    }
+
+    body { padding: 0; }
+
+    .viewport-fit {
+      width: 100%;
+      height: 100vh;
+      height: 100svh;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding: 6px;
+      overflow: hidden;
+    }
+
+    .shell {
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 50% 100%, rgba(105,92,255,0.18), transparent 28%),
+        linear-gradient(180deg, rgba(8,4,15,0.98) 0%, rgba(11,5,21,0.98) 22%, rgba(15,8,34,0.98) 58%, rgba(31,20,86,0.98) 100%);
+      box-shadow: var(--shadow-shell);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.07) 0.8px, transparent 0.8px);
+      background-size: 34px 34px;
+      opacity: 0.18;
+      pointer-events: none;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85), rgba(0,0,0,0.45));
+    }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr) 86px;
+      gap: 22px;
+      min-height: 880px;
+    }
+
+    .sidebar,
+    .rail {
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(12,6,26,0.98), rgba(8,4,18,0.98));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 10px;
+    }
+
+    .brand {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      background: var(--logo) center / contain no-repeat;
+    }
+
+    .nav, .rail-list, .rail-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-btn, .round-btn, .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+    }
+
+    .nav-btn { font-size: 22px; color: rgba(255,255,255,0.92); }
+    .nav-btn.active {
+      color: var(--cyan);
+      background: radial-gradient(circle at 50% 50%, rgba(255,84,183,0.14), rgba(99,232,255,0.07) 44%, transparent 74%);
+    }
+
+    .plus-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      border: 2px dashed rgba(99,232,255,0.24);
+      display: grid;
+      place-items: center;
+    }
+
+    .plus-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: linear-gradient(180deg, #5ed9ff, #598bff);
+    }
+
+    .main { padding-top: 2px; }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr 390px 50px 50px 56px;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .greeting {
+      font-size: 16px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .greeting b {
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .search {
+      height: 52px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      background: linear-gradient(180deg, rgba(31,14,67,0.98), rgba(24,10,52,0.98));
+      border: 1px solid var(--stroke);
+      color: var(--muted);
+    }
+
+    .search-icon {
+      width: 17px;
+      height: 17px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .search-icon::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 2px;
+      background: currentColor;
+      right: -6px;
+      bottom: -1px;
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .top-icon, .profile {
+      height: 50px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(24,11,52,0.98), rgba(13,7,27,0.98));
+      border: 1px solid var(--stroke);
+      position: relative;
+      box-shadow: var(--shadow-card);
+    }
+
+    .top-icon { width: 50px; font-size: 20px; }
+    .profile { width: 56px; }
+    .top-icon.notify::after,
+    .top-icon.user::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ff5c6d;
+      box-shadow: 0 0 0 3px #150a2e;
+    }
+
+    .profile-face, .avatar-face {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at 50% 34%, #efc79f 0 18%, transparent 19%),
+        radial-gradient(circle at 50% 70%, #c98d5d 0 26%, transparent 27%),
+        linear-gradient(180deg, #6b4a34, #3d291a);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.66fr) 360px;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .hero-card {
+      min-height: 350px;
+      border-radius: 32px;
+      position: relative;
+      overflow: hidden;
+      padding: 20px 26px 22px;
+      background:
+        radial-gradient(circle at 26% 14%, rgba(255,255,255,0.16), transparent 18%),
+        linear-gradient(90deg, #808694 0%, #666d7c 26%, #272a37 63%, #11141c 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow-card);
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      right: -28px;
+      bottom: -28px;
+      width: 53%;
+      height: 118%;
+      background: var(--monster) right bottom / contain no-repeat;
+      transform: scaleX(-1);
+      filter: drop-shadow(0 0 16px rgba(255,40,76,0.34)) drop-shadow(0 0 32px rgba(255,40,76,0.22));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 74% 56%, rgba(255,30,74,0.20), transparent 16%),
+        linear-gradient(90deg, rgba(0,0,0,0) 40%, rgba(10,12,18,0.08) 55%, rgba(9,10,16,0.34) 82%, rgba(0,0,0,0) 100%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      width: 43%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .chips {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .chip.popular {
+      background: rgba(246,233,186,0.98);
+      color: #332111;
+    }
+
+    .chip.small {
+      width: 38px;
+      padding: 0;
+      justify-content: center;
+      background: #1a0d37;
+      color: #fff;
+    }
+
+    .chip-ring {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+    }
+
+    .hero-logo {
+      width: 220px;
+      height: 110px;
+      background: var(--logo) left center / contain no-repeat;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(99,232,255,0.18));
+    }
+
+    .hero-text {
+      font-size: 17px;
+      line-height: 1.48;
+      color: #eef3ff;
+      max-width: 340px;
+    }
+
+    .hero-footer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .bubbles {
+      display: flex;
+      align-items: center;
+    }
+
+    .bubble {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-left: -10px;
+      border: 3px solid #727987;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    }
+
+    .bubble:first-child { margin-left: 0; }
+    .bubble.b1 { background: radial-gradient(circle at 35% 35%, #bee7ff, #5f9dcc 62%, #1d2d55); }
+    .bubble.b2 { background: radial-gradient(circle at 35% 35%, #ffd0ea, #c13191 62%, #42102a); }
+    .bubble.b3 { background: radial-gradient(circle at 35% 35%, #dbffd0, #4daf61 62%, #194126); }
+
+    .reviews {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.96);
+      color: #181d30;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+
+    .thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #17203f, #2e5f9c);
+      font-size: 11px;
+    }
+
+    .hero-side {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .dots {
+      height: 18px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dots span {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      display: block;
+    }
+
+    .dots span:nth-child(1) { width: 28px; background: var(--pink); }
+    .dots span:nth-child(2) { width: 34px; background: rgba(99,232,255,0.38); }
+    .dots span:nth-child(3) { width: 18px; }
+
+    .side-card {
+      min-height: 95px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(12,6,26,0.98), rgba(8,4,18,0.98));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .side-card::after {
+      content: "›";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 28px;
+      color: #eef2ff;
+    }
+
+    .cover {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      flex: 0 0 auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+    }
+
+    .cover.free { background: radial-gradient(circle at 40% 35%, #eef3ff, #aab6cb 62%, #31384a); }
+    .cover.team { background: radial-gradient(circle at 36% 34%, #69ecff, #4069ff 42%, #ff48a2 78%, #2c0b1d); }
+    .cover.coop { background: radial-gradient(circle at 36% 34%, #d7f2ff, #6f97ff 44%, #7151ff 78%, #271645); }
+
+    .side-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .side-sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.3;
+      max-width: 220px;
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin: 2px 0 14px;
+    }
+
+    .section-title, .section-title-right {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .see-more, .arrow {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) 360px;
+      gap: 16px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 160px;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      min-height: 214px;
+      border-radius: 28px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .card.ffa {
+      background:
+        radial-gradient(circle at 28% 34%, rgba(255,255,255,0.10), transparent 14%),
+        linear-gradient(135deg, #090a10 0%, #11152d 42%, #090a10 100%);
+    }
+
+    .card.ffa::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 74% 32%, rgba(255,86,183,0.18), transparent 14%),
+        linear-gradient(130deg, transparent 55%, rgba(255,255,255,0.06) 56%, transparent 57%);
+    }
+
+    .card.hub {
+      background:
+        radial-gradient(circle at 48% 28%, rgba(99,232,255,0.18), transparent 12%),
+        linear-gradient(135deg, #20114a 0%, #27145b 42%, #171036 100%);
+    }
+
+    .card.slider {
+      background: linear-gradient(180deg, rgba(31,18,76,0.52), rgba(14,10,33,0.76));
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+
+    .play, .bag, .slide {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.14);
+    }
+
+    .play {
+      left: 18px;
+      top: 18px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      color: #5a88ff;
+      font-size: 24px;
+    }
+
+    .bag {
+      right: 18px;
+      top: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      color: var(--pink);
+      font-size: 18px;
+    }
+
+    .slide {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      color: #181b2d;
+      font-size: 28px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.04;
+      position: relative;
+      z-index: 1;
+      margin: 0 0 8px;
+    }
+
+    .card-text {
+      font-size: 14px;
+      line-height: 1.52;
+      color: #eef2ff;
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      max-width: 250px;
+    }
+
+    .wallet-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .wallet-banner {
+      min-height: 116px;
+      border-radius: 28px;
+      display: grid;
+      grid-template-columns: 106px 1.2fr 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 18px 20px;
+      background: linear-gradient(90deg, #29306b 0%, #242d67 24%, #171034 62%, #0d0a1d 100%);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wallet-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 34%, rgba(255,255,255,0.08) 49%, transparent 55%);
+    }
+
+    .wallet-icon,
+    .stat-mini {
+      position: relative;
+      z-index: 1;
+    }
+
+    .wallet-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fff6d9, #ece1af);
+      display: grid;
+      place-items: center;
+      color: #111;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .wallet-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wallet-tag {
+      display: inline-flex;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 14px;
+      align-items: center;
+      background: rgba(10,10,26,0.50);
+      color: #eef4ff;
+      font-size: 12px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wallet-values {
+      position: relative;
+      z-index: 1;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #eef4ff;
+    }
+
+    .wallet-values span {
+      display: block;
+      color: #9fc9ff;
+      margin-top: 4px;
+    }
+
+    .wallet-actions {
+      display: flex;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .action {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .action.play { position: static; background: #56d9ff; color: #071321; box-shadow: none; }
+    .action.close { background: rgba(255,255,255,0.92); color: #5a88ff; }
+
+    .stats-panel {
+      min-height: 348px;
+      border-radius: 30px;
+      padding: 24px 22px 20px;
+      background: linear-gradient(180deg, #1a1040 0%, #100922 100%);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ring {
+      width: 236px;
+      height: 236px;
+      border-radius: 50%;
+      position: relative;
+      margin-top: 4px;
+      background:
+        radial-gradient(circle at 50% 50%, #130c2d 0 34%, transparent 35%),
+        conic-gradient(from 20deg, #ff7168, #f1d49f, #8b8cff, #69eaff, #ff7168);
+    }
+
+    .ring::before {
+      content: "";
+      position: absolute;
+      inset: 25px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #140d2f, #0d091a);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .ring::after {
+      content: "";
+      position: absolute;
+      inset: 50px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #100a24, #090612);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .ring-label {
+      font-size: 14px;
+      color: #cdd5ff;
+      margin-bottom: 8px;
+    }
+
+    .ring-value {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .stats-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .stat-mini {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+    }
+
+    .stat-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+    }
+
+    .stat-icon.red { background: linear-gradient(180deg, #ff7168, #ef574e); }
+    .stat-icon.yellow { background: linear-gradient(180deg, #f6efb5, #e7dea1); color: #2d1d11; }
+    .stat-icon.blue { background: linear-gradient(180deg, #9a91ff, #7b79ff); }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff2f5, #ffe5ea);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 16px rgba(0,0,0,0.14);
+    }
+
+    .avatar.online::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 3px #100723;
+    }
+
+    .avatar-face.green { background: radial-gradient(circle at 50% 34%, #ddf6cb 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #8dd86a 0 26%, transparent 27%), linear-gradient(180deg, #528742, #1f4521); }
+    .avatar-face.red { background: radial-gradient(circle at 50% 34%, #ffd2cb 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #ff6f6f 0 26%, transparent 27%), linear-gradient(180deg, #d24646, #661515); }
+    .avatar-face.gold { background: radial-gradient(circle at 50% 34%, #f7d6b6 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #e8b66a 0 26%, transparent 27%), linear-gradient(180deg, #c28a39, #6c4111); }
+    .avatar-face.pink { background: radial-gradient(circle at 50% 34%, #f5c6c9 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #ff8cb1 0 26%, transparent 27%), linear-gradient(180deg, #c7486f, #77233f); }
+    .avatar-face.blue { background: radial-gradient(circle at 50% 34%, #cfe4ff 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #6aa9ff 0 26%, transparent 27%), linear-gradient(180deg, #2d65c8, #17336c); }
+    .avatar-face.orange { background: radial-gradient(circle at 50% 34%, #ffe0bf 0 18%, transparent 19%), radial-gradient(circle at 50% 70%, #ffa25a 0 26%, transparent 27%), linear-gradient(180deg, #c96d25, #582b08); }
+
+    .status-tag {
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translate(100%, -50%);
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      background: var(--green);
+      color: #08160d;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .round-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      color: #2a2f61;
+      font-size: 22px;
+      position: relative;
+    }
+
+    .round-btn.dark {
+      background: linear-gradient(180deg, #180d31, #0a0716);
+      color: white;
+    }
+
+    .round-btn.alert::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #ff5c6d;
+      box-shadow: 0 0 0 3px #100723;
+    }
+
+    .ps-badge {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      background: radial-gradient(circle at 50% 40%, #63e8ff, #5a88ff 64%, #252b69);
+      box-shadow: 0 10px 16px rgba(0,0,0,0.15);
+    }
+
+    @media (min-width: 841px) {
+      html, body {
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .viewport-fit {
+        height: 100%;
+        padding: 6px;
+      }
+
+      .shell {
+        padding: clamp(10px, 1vw, 20px);
+        border-radius: clamp(22px, 1.8vw, 34px);
+      }
+
+      .layout {
+        height: 100%;
+        min-height: 0;
+        gap: clamp(12px, 1vw, 22px);
+        grid-template-columns: clamp(72px, 5vw, 86px) minmax(0, 1fr) clamp(72px, 5vw, 86px);
+      }
+
+      .sidebar,
+      .rail {
+        padding: 12px 8px;
+        border-radius: 24px;
+      }
+
+      .nav,
+      .rail-list,
+      .rail-bottom {
+        gap: clamp(10px, 0.9vw, 16px);
+      }
+
+      .nav-btn,
+      .round-btn,
+      .avatar {
+        width: clamp(42px, 3.3vw, 50px);
+        height: clamp(42px, 3.3vw, 50px);
+      }
+
+      .brand,
+      .plus-wrap {
+        width: clamp(48px, 3.8vw, 58px);
+        height: clamp(48px, 3.8vw, 58px);
+      }
+
+      .plus-btn {
+        width: clamp(34px, 2.6vw, 40px);
+        height: clamp(34px, 2.6vw, 40px);
+      }
+
+      .main {
+        min-width: 0;
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 0.92fr);
+      }
+
+      .topbar {
+        grid-template-columns: 1fr minmax(280px, 34%) 46px 46px 52px;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .greeting {
+        font-size: clamp(14px, 1vw, 16px);
+      }
+
+      .greeting b {
+        font-size: clamp(16px, 1.2vw, 18px);
+      }
+
+      .search {
+        height: clamp(44px, 5vh, 52px);
+        padding: 0 16px;
+      }
+
+      .top-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 18px;
+      }
+
+      .profile {
+        width: 52px;
+        height: 46px;
+      }
+
+      .profile-face,
+      .avatar-face {
+        width: clamp(28px, 2.1vw, 34px);
+        height: clamp(28px, 2.1vw, 34px);
+      }
+
+      .hero-grid {
+        grid-template-columns: minmax(0, 1.72fr) minmax(320px, 0.98fr);
+        gap: 12px;
+        margin-bottom: 10px;
+        align-items: stretch;
+        min-height: 0;
+      }
+
+      .hero-card {
+        min-height: clamp(220px, 32vh, 320px);
+        height: 100%;
+      }
+
+      .hero-content {
+        width: min(45%, 360px);
+      }
+
+      .chips {
+        margin-bottom: 10px;
+      }
+
+      .chip {
+        height: clamp(34px, 4vh, 38px);
+        padding: 0 14px;
+        font-size: 13px;
+      }
+
+      .chip.small {
+        width: clamp(34px, 4vh, 38px);
+      }
+
+      .hero-logo {
+        width: clamp(176px, 14vw, 220px);
+        height: clamp(84px, 7vw, 110px);
+        margin-bottom: 8px;
+      }
+
+      .hero-text {
+        font-size: clamp(14px, 1vw, 17px);
+        line-height: 1.36;
+        max-width: 28ch;
+      }
+
+      .hero-footer {
+        margin-top: 10px;
+      }
+
+      .bubble {
+        width: clamp(34px, 2.8vw, 40px);
+        height: clamp(34px, 2.8vw, 40px);
+      }
+
+      .reviews {
+        height: clamp(38px, 4.2vh, 44px);
+        padding: 0 14px;
+      }
+
+      .hero-side {
+        display: grid;
+        grid-template-rows: 14px repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .side-card {
+        min-height: clamp(66px, 8.5vh, 88px);
+        padding: 12px 16px;
+        height: 100%;
+      }
+
+      .cover {
+        width: clamp(54px, 4.4vw, 68px);
+        height: clamp(54px, 4.4vw, 68px);
+      }
+
+      .side-title {
+        font-size: clamp(14px, 1vw, 16px);
+        margin-bottom: 3px;
+      }
+
+      .side-sub {
+        font-size: clamp(12px, 0.95vw, 15px);
+        line-height: 1.22;
+        max-width: 180px;
+      }
+
+      .section-row {
+        margin: 2px 0 10px;
+      }
+
+      .section-title,
+      .section-title-right {
+        font-size: clamp(16px, 1.2vw, 18px);
+      }
+
+      .see-more,
+      .arrow {
+        font-size: 14px;
+      }
+
+      .content {
+        grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.98fr);
+        gap: 12px;
+        align-items: stretch;
+        min-height: 0;
+      }
+
+      .content > div {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) auto auto;
+        min-height: 0;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr 1fr 132px;
+        gap: 12px;
+        margin-bottom: 12px;
+        min-height: 0;
+      }
+
+      .card {
+        min-height: clamp(126px, 18vh, 180px);
+        height: 100%;
+      }
+
+      .play {
+        left: 14px;
+        top: 14px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+      }
+
+      .bag {
+        right: 14px;
+        top: 14px;
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+
+      .slide {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+      }
+
+      .card-title {
+        font-size: clamp(19px, 1.45vw, 24px);
+        margin-bottom: 6px;
+      }
+
+      .card-text {
+        font-size: clamp(12px, 0.92vw, 14px);
+        line-height: 1.34;
+        max-width: 220px;
+      }
+
+      .wallet-head {
+        margin-bottom: 10px;
+      }
+
+      .wallet-banner {
+        min-height: clamp(84px, 13vh, 116px);
+        grid-template-columns: 84px 1.14fr 0.96fr auto;
+        gap: 14px;
+        padding: 14px 16px;
+      }
+
+      .wallet-icon {
+        width: clamp(58px, 4.6vw, 80px);
+        height: clamp(58px, 4.6vw, 80px);
+        font-size: clamp(22px, 1.7vw, 30px);
+        border-radius: 18px;
+      }
+
+      .wallet-title {
+        font-size: clamp(14px, 1vw, 16px);
+        margin-bottom: 6px;
+      }
+
+      .wallet-tag {
+        height: 24px;
+        font-size: 11px;
+      }
+
+      .wallet-values {
+        font-size: clamp(12px, 0.92vw, 14px);
+        line-height: 1.35;
+      }
+
+      .action {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+      }
+
+      .stats-panel {
+        min-height: clamp(196px, 28vh, 300px);
+        padding: 16px 16px 14px;
+        height: 100%;
+      }
+
+      .ring {
+        width: clamp(138px, 18vh, 210px);
+        height: clamp(138px, 18vh, 210px);
+      }
+
+      .ring::before {
+        inset: clamp(18px, 2.4vh, 25px);
+      }
+
+      .ring::after {
+        inset: clamp(34px, 4.6vh, 50px);
+      }
+
+      .ring-label {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .ring-value {
+        font-size: clamp(20px, 1.7vw, 24px);
+      }
+
+      .stats-row {
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .stat-mini {
+        gap: 8px;
+      }
+
+      .stat-icon {
+        width: clamp(42px, 3.5vw, 58px);
+        height: clamp(42px, 3.5vw, 58px);
+        font-size: clamp(16px, 1.2vw, 20px);
+      }
+
+      .stat-value {
+        font-size: clamp(13px, 0.95vw, 16px);
+      }
+
+      .status-tag {
+        height: 20px;
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 1300px) {
+      .hero-content { width: 48%; }
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .card.slider { display: none; }
+    }
+
+    @media (max-width: 1120px) {
+      .layout { grid-template-columns: 80px minmax(0, 1fr); }
+      .rail { display: none; }
+      .topbar { grid-template-columns: 1fr 1fr 50px 50px 56px; }
+      .hero-grid, .content { grid-template-columns: 1fr; }
+      .section-row { grid-template-columns: 1fr auto; }
+      .section-title-right, .arrow { display: none; }
+    }
+
+    @media (max-width: 840px) {
+      body { padding: 12px; }
+      .viewport-fit {
+        min-height: auto;
+        padding: 0;
+        overflow: visible;
+        display: block;
+      }
+      .shell {
+        width: min(100%, 1460px);
+        margin: 0 auto;
+        padding: 14px;
+        border-radius: 24px;
+        transform: none;
+      }
+      .layout { grid-template-columns: 1fr; min-height: auto; }
+      .sidebar {
+        min-height: auto;
+        flex-direction: row;
+        padding: 12px 16px;
+      }
+      .nav { flex-direction: row; }
+      .plus-wrap { display: none; }
+      .topbar { grid-template-columns: 1fr; }
+      .hero-card::before { width: 56%; height: 92%; right: -12px; bottom: -10px; opacity: 0.72; }
+      .hero-content { width: 100%; }
+      .hero-logo { width: 190px; height: 96px; }
+      .cards-grid, .wallet-banner { grid-template-columns: 1fr; }
+      .stats-panel { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport-fit">
+  <main class="shell" id="dashboardShell">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand"></div>
+
+        <div class="nav">
+          <div class="nav-btn active">⌂</div>
+          <div class="nav-btn">🎮</div>
+          <div class="nav-btn">🎁</div>
+          <div class="nav-btn">📺</div>
+          <div class="nav-btn">◔</div>
+          <div class="nav-btn">💼</div>
+          <div class="nav-btn">💬</div>
+        </div>
+
+        <div class="plus-wrap"><div class="plus-btn">+</div></div>
+      </aside>
+
+      <section class="main">
+        <header class="topbar">
+          <div class="greeting">Good evening, <b>USERNAME</b></div>
+          <div class="search"><span class="search-icon"></span><span>Search</span></div>
+          <div class="top-icon">🛒</div>
+          <div class="top-icon notify">🔔</div>
+          <div class="profile"><div class="profile-face"></div></div>
+        </header>
+
+        <section class="hero-grid">
+          <article class="hero-card">
+            <div class="hero-content">
+              <div>
+                <div class="chips">
+                  <span class="chip popular"><span class="chip-ring"></span>Popular</span>
+                  <span class="chip small">S</span>
+                  <span class="chip small">EP</span>
+                </div>
+                <div class="hero-logo" aria-label="PLAYSOL logo"></div>
+                <div class="hero-text">
+                  Survive, dominate, climb the ladder and enter free play, cashgame modes, clans, referrals and social multiplayer systems inside one clean dashboard.
+                </div>
+              </div>
+              <div class="hero-footer">
+                <div class="bubbles">
+                  <span class="bubble b1"></span>
+                  <span class="bubble b2"></span>
+                  <span class="bubble b3"></span>
+                </div>
+                <div class="reviews"><span class="thumb">👍</span> +53 Reviews</div>
+              </div>
+            </div>
+          </article>
+
+          <div class="hero-side">
+            <div class="dots"><span></span><span></span><span></span></div>
+
+            <article class="side-card">
+              <div class="cover free"></div>
+              <div>
+                <div class="side-title">Free Game</div>
+                <div class="side-sub">No buy-in + survive & dominate</div>
+              </div>
+            </article>
+
+            <article class="side-card">
+              <div class="cover team"></div>
+              <div>
+                <div class="side-title">Team Battle Cashgame</div>
+                <div class="side-sub">Winning team splits the prize</div>
+              </div>
+            </article>
+
+            <article class="side-card">
+              <div class="cover coop"></div>
+              <div>
+                <div class="side-title">Coop Cashgame</div>
+                <div class="side-sub">Top teams share the win pool</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <div class="section-row">
+          <div class="section-title">Game Modes</div>
+          <div class="see-more">See More</div>
+          <div class="section-title-right">Your Statistic</div>
+          <div class="arrow">→</div>
+        </div>
+
+        <section class="content">
+          <div>
+            <div class="cards-grid">
+              <article class="card ffa">
+                <div class="play">▶</div>
+                <div class="bag">👜</div>
+                <h3 class="card-title">FFA Cashgame</h3>
+                <p class="card-text">Top 10 share the prize pool and fight for direct rank progress, gameplay earnings and status.</p>
+              </article>
+
+              <article class="card hub">
+                <h3 class="card-title">Clan / Referral Hub</h3>
+                <p class="card-text">Join clan systems, invite friends and stack referral income across your network lanes.</p>
+              </article>
+
+              <article class="card slider"><div class="slide">›</div></article>
+            </div>
+
+            <div class="wallet-head">
+              <div class="section-title">Account / Wallet</div>
+              <div class="see-more">See More</div>
+            </div>
+
+            <article class="wallet-banner">
+              <div class="wallet-icon">$</div>
+              <div>
+                <div class="wallet-title">Deposit / Withdraw</div>
+                <span class="wallet-tag">Wallet + Cashflow</span>
+              </div>
+              <div class="wallet-values">
+                Total gameplay earnings: $234
+                <span>Total lane income: $473</span>
+              </div>
+              <div class="wallet-actions">
+                <span class="action play">▶</span>
+                <span class="action close">✕</span>
+              </div>
+            </article>
+          </div>
+
+          <aside class="stats-panel">
+            <div class="ring">
+              <div class="ring-center">
+                <div class="ring-label">Players online</div>
+                <div class="ring-value">230,486</div>
+              </div>
+            </div>
+
+            <div class="stats-row">
+              <div class="stat-mini">
+                <div class="stat-icon red">$</div>
+                <div class="stat-value">$234</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-icon yellow">👥</div>
+                <div class="stat-value">4 / 9</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-icon blue">🏆</div>
+                <div class="stat-value">361,498</div>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </section>
+
+      <aside class="rail">
+        <div class="rail-list">
+          <div class="avatar"><div class="profile-face"></div></div>
+        </div>
+
+        <div class="rail-list">
+          <div class="avatar online"><div class="avatar-face green"></div><div class="status-tag">In Game</div></div>
+          <div class="avatar online"><div class="avatar-face red"></div></div>
+          <div class="avatar online"><div class="avatar-face gold"></div></div>
+          <div class="avatar"><div class="avatar-face pink"></div></div>
+          <div class="avatar online"><div class="avatar-face blue"></div></div>
+          <div class="avatar"><div class="avatar-face orange"></div></div>
+        </div>
+
+        <div class="rail-bottom">
+          <div class="round-btn dark">🎧</div>
+          <div class="round-btn alert">👥</div>
+          <div class="ps-badge">PS</div>
+        </div>
+      </aside>
+    </div>
+  </main>
+  </div>
+</body>
+</html>
