@@ -1,34 +1,24 @@
 import { useDeferredValue, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import {
-  Bell,
-  ChevronRight,
-  Headphones,
-  LoaderCircle,
-  Plus,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Swords,
-  Trophy,
-  Users,
-  Wallet
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   DASHBOARD_SECTIONS,
   FREE_GAME_WINDOW_FEATURES,
-  GAME_MODE_CARDS,
   NOTIFICATION_ITEMS,
   normalizeUsername,
   usernameError
 } from "@shared/index.js";
 import { apiRequest, getDashboardBootstrap } from "./lib/api.js";
 import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
-import { iconMap, placeholderRail, sectionTitles } from "./components/constants.jsx";
+import { placeholderRail } from "./components/constants.jsx";
 import { defaultDashboardState } from "./components/dashboard-defaults.jsx";
 import { AuthModal, LoadingScreen, NotificationDrawer, ProfileModal, UsernameModal } from "./components/Overlays.jsx";
 import { GuardCard, LoadingCard, SectionContent } from "./components/SectionContent.jsx";
-import { formatCurrency, formatNumber } from "./lib/formatters.js";
+import { getSectionPresentation } from "./components/dashboard-presentation.jsx";
+import { HeroSection } from "./components/HeroSection.jsx";
+import { OverviewHome } from "./components/OverviewHome.jsx";
+import { Sidebar, Topbar, RightRail } from "./components/ShellParts.jsx";
+import { StatsPanel } from "./components/StatsPanel.jsx";
 
 const FREE_GAME_URL = import.meta.env.VITE_FREE_GAME_URL || "";
 
@@ -128,6 +118,8 @@ function DashboardApp() {
   const deferredSearch = useDeferredValue(searchQuery.trim().toLowerCase());
   const isAuthenticated = Boolean(currentUser);
   const currentSection = DASHBOARD_SECTIONS.find((item) => item.id === activeSection) || DASHBOARD_SECTIONS[0];
+  const sectionBlocked = currentSection.protected && !isAuthenticated;
+  const overviewReady = activeSection === "overview" && !dashboardLoading && !sectionBlocked;
 
   useEffect(() => {
     if (!toastMessage) {
@@ -391,6 +383,15 @@ function DashboardApp() {
         online: false
       }))
     : placeholderRail;
+  const sectionPresentation = getSectionPresentation({
+    activeSection,
+    dashboardState,
+    isAuthenticated,
+    currentUser,
+    acceptedFriends: filteredAcceptedFriends,
+    incomingFriends: filteredIncomingFriends,
+    blockedFriends: filteredBlockedFriends
+  });
 
   if (booting || (location.pathname === "/auth/callback" && !session)) {
     return <LoadingScreen title="Dashboard wird geladen" copy="Session und Dashboard-Daten werden gerade vorbereitet." />;
@@ -401,193 +402,119 @@ function DashboardApp() {
   return (
     <div className="app-root">
       <div className="viewport-fit">
-        <main className="shell">
-          <div className="layout">
-            <aside className="sidebar">
-              <div className="brand">PS</div>
-              <div className="nav-stack">
-                {DASHBOARD_SECTIONS.map((section) => {
-                  const Icon = iconMap[section.icon];
-                  const locked = section.protected && !isAuthenticated;
-                  return (
+        <main className={`shell shell-${activeSection}`}>
+          <div className={`layout layout-${activeSection}`}>
+            <Sidebar
+              activeSection={activeSection}
+              isAuthenticated={isAuthenticated}
+              onOpenAuth={() => setAuthModalMode("login")}
+              onSectionChange={setActiveSection}
+              onFreeGame={() => openFreeGame(setToastMessage)}
+            />
+
+            <section className={`main-panel main-panel-${activeSection}`}>
+              <Topbar
+                greetingName={greetingName}
+                isAuthenticated={isAuthenticated}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onFreeGame={() => openFreeGame(setToastMessage)}
+                onNotifications={() => setNotificationsOpen(true)}
+                onProfile={() => (isAuthenticated ? setProfileOpen(true) : setAuthModalMode("login"))}
+              />
+
+              {activeSection === "overview" && dashboardLoading ? (
+                <LoadingScreen title="Overview wird geladen" copy="Free Game, Stats und Account-Daten werden gerade sauber vorbereitet." />
+              ) : overviewReady ? (
+                <OverviewHome
+                  presentation={sectionPresentation}
+                  dashboardState={dashboardState}
+                  onQuickAction={() => openFreeGame(setToastMessage)}
+                  onMiniCardAction={(card) => {
+                    if (card.action === "launch-free") {
+                      openFreeGame(setToastMessage);
+                      return;
+                    }
+                    if (card.action === "protected" && !isAuthenticated) {
+                      setAuthModalMode("login");
+                      return;
+                    }
+                    if (card.action !== "noop") {
+                      setToastMessage(`${card.title} bleibt in V1 vorbereitet.`);
+                    }
+                  }}
+                />
+              ) : (
+                <>
+                  <HeroSection
+                    hero={sectionPresentation.hero}
+                    miniCards={sectionPresentation.miniCards}
+                    onMiniCardAction={(card) => {
+                      if (card.action === "launch-free") {
+                        openFreeGame(setToastMessage);
+                        return;
+                      }
+                      if (card.action === "protected" && !isAuthenticated) {
+                        setAuthModalMode("login");
+                        return;
+                      }
+                      if (card.action !== "noop") {
+                        setToastMessage(`${card.title} bleibt in V1 vorbereitet.`);
+                      }
+                    }}
+                  />
+
+                  <div className="section-row">
+                    <div className="section-title">{sectionPresentation.title}</div>
                     <button
-                      key={section.id}
                       type="button"
-                      className={`nav-btn ${activeSection === section.id ? "active" : ""}`}
-                      onClick={() => (locked ? setAuthModalMode("login") : setActiveSection(section.id))}
-                      title={locked ? `${section.label} (Login erforderlich)` : section.label}
+                      className="see-more"
+                      onClick={() => (activeSection === "play" ? openFreeGame(setToastMessage) : setToastMessage("Dieser Bereich ist als klares Dashboard-Panel organisiert."))}
                     >
-                      <Icon size={20} />
+                      {sectionPresentation.quickLabel}
                     </button>
-                  );
-                })}
-              </div>
-              <button type="button" className="plus-wrap" onClick={() => openFreeGame(setToastMessage)} title="Free Game in neuem Tab starten">
-                <span className="plus-btn">
-                  <Plus size={22} />
-                </span>
-              </button>
-            </aside>
-
-            <section className="main-panel">
-              <header className="topbar">
-                <div className="greeting">
-                  Good evening, <b>{greetingName}</b>
-                </div>
-                <label className="search">
-                  <Search size={18} />
-                  <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search dashboard" />
-                </label>
-                <button type="button" className="top-icon" onClick={() => openFreeGame(setToastMessage)} title="Free Game">
-                  <Swords size={18} />
-                </button>
-                <button type="button" className="top-icon notify" onClick={() => setNotificationsOpen(true)} title="Notifications">
-                  <Bell size={18} />
-                </button>
-                <button type="button" className="profile-pill" onClick={() => (isAuthenticated ? setProfileOpen(true) : setAuthModalMode("login"))}>
-                  <span className="profile-face profile-face-gold" />
-                  <span>{isAuthenticated ? "Profile" : "Login"}</span>
-                </button>
-              </header>
-
-              <section className="hero-grid">
-                <article className="hero-card">
-                  <div className="hero-content">
-                    <div className="chips">
-                      <span className="chip popular"><span className="chip-ring" />Popular</span>
-                      <span className="chip small">V1</span>
-                      <span className="chip small">{isAuthenticated ? "LIVE" : "GUEST"}</span>
-                    </div>
-                    <div className="hero-logo"><span>PlaySol</span><span className="hero-logo-sub">Dashboard</span></div>
-                    <div className="hero-text">
-                      {isAuthenticated
-                        ? "Profile, Progress, Match-History, Inventory und Friends laufen jetzt ueber einen eigenstaendigen Dashboard-Stack mit Supabase Auth."
-                        : "Free Game bleibt sofort verfuegbar. Mit Account kommen spaeter Progress, Match-History, Friends, Wallet und Inventory direkt dazu."}
-                    </div>
-                    <div className="hero-footer">
-                      <div className="bubbles"><span className="bubble bubble-blue" /><span className="bubble bubble-pink" /><span className="bubble bubble-green" /></div>
-                      <div className="reviews">
-                        <ShieldCheck size={16} />
-                        <div>
-                          <strong>{isAuthenticated ? `Lvl ${dashboardState.stats.progress.level}` : "Guest"}</strong>
-                          <span>{isAuthenticated ? `${dashboardState.stats.progress.rank} rank` : "Account fuer Progress verbinden"}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-
-                <aside className="hero-side">
-                  <div className="dots"><span /><span /><span /></div>
-                  {GAME_MODE_CARDS.map((mode) => (
-                    <button
-                      key={mode.id}
-                      type="button"
-                      className={`side-card ${mode.locked && !isAuthenticated ? "locked" : ""}`}
-                      onClick={() => {
-                        if (mode.id === "free") return openFreeGame(setToastMessage);
-                        if (!isAuthenticated) return setAuthModalMode("login");
-                        setToastMessage(`${mode.title} bleibt in V1 vorbereitet.`);
-                      }}
-                    >
-                      <div className={`cover ${mode.accent}`} />
-                      <div className="side-copy">
-                        <div className="side-title">{mode.title}</div>
-                        <div className="side-sub">{mode.subtitle}</div>
-                      </div>
-                      <ChevronRight size={18} />
-                    </button>
-                  ))}
-                </aside>
-              </section>
-
-              <div className="section-row">
-                <div className="section-title">{sectionTitles[activeSection]}</div>
-                <button type="button" className="see-more" onClick={() => (activeSection === "play" ? openFreeGame(setToastMessage) : setToastMessage("Dieser Bereich ist in V1 als kompaktes Dashboard-Panel angelegt."))}>
-                  Quick Action
-                </button>
-                <div className="section-title-right">{isAuthenticated ? "Your Statistic" : "Member Dashboard"}</div>
-                <div className="arrow-wrap"><ChevronRight size={18} /></div>
-              </div>
-
-              <section className="content-grid">
-                <div className="content-stack">
-                  {dashboardLoading ? (
-                    <LoadingCard />
-                  ) : currentSection.protected && !isAuthenticated ? (
-                    <GuardCard onLogin={() => setAuthModalMode("login")} />
-                  ) : (
-                    <SectionContent
-                      activeSection={activeSection}
-                      dashboardState={dashboardState}
-                      filteredHistoryItems={filteredHistoryItems}
-                      filteredAcceptedFriends={filteredAcceptedFriends}
-                      filteredIncomingFriends={filteredIncomingFriends}
-                      filteredOutgoingFriends={filteredOutgoingFriends}
-                      filteredBlockedFriends={filteredBlockedFriends}
-                      friendRequestName={friendRequestName}
-                      setFriendRequestName={setFriendRequestName}
-                      onFriendRequest={handleFriendRequest}
-                      onFriendAction={handleFriendAction}
-                      friendBusy={friendBusy}
-                      onOpenAuth={() => setAuthModalMode("login")}
-                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
-                    />
-                  )}
-                </div>
-
-                <aside className="stats-panel">
-                  <div className="ring">
-                    <div className="ring-center">
-                      <div className="ring-label">{isAuthenticated ? "XP to next level" : "Players online"}</div>
-                      <div className="ring-value">{isAuthenticated ? formatNumber(dashboardState.stats.progress.xp) : "230,486"}</div>
-                      <div className="ring-meta">{isAuthenticated ? `Level ${dashboardState.stats.progress.level}` : "Live population preview"}</div>
-                    </div>
+                    <div className="section-title-right">{sectionPresentation.rightTitle}</div>
+                    <div className="arrow-wrap"><ChevronRight size={18} /></div>
                   </div>
 
-                  <div className="stats-row">
-                    <div className="stat-mini">
-                      <div className="stat-icon red"><Wallet size={16} /></div>
-                      <div className="stat-value">{formatCurrency(dashboardState.wallet.cash_balance)} $</div>
-                      <div className="stat-label">Cash</div>
+                  <section className="content-grid">
+                    <div className="content-stack">
+                      {dashboardLoading ? (
+                        <LoadingCard />
+                      ) : sectionBlocked ? (
+                        <GuardCard onLogin={() => setAuthModalMode("login")} />
+                      ) : (
+                        <SectionContent
+                          activeSection={activeSection}
+                          dashboardState={dashboardState}
+                          filteredHistoryItems={filteredHistoryItems}
+                          filteredAcceptedFriends={filteredAcceptedFriends}
+                          filteredIncomingFriends={filteredIncomingFriends}
+                          filteredOutgoingFriends={filteredOutgoingFriends}
+                          filteredBlockedFriends={filteredBlockedFriends}
+                          friendRequestName={friendRequestName}
+                          setFriendRequestName={setFriendRequestName}
+                          onFriendRequest={handleFriendRequest}
+                          onFriendAction={handleFriendAction}
+                          friendBusy={friendBusy}
+                          onOpenAuth={() => setAuthModalMode("login")}
+                          onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                        />
+                      )}
                     </div>
-                    <div className="stat-mini">
-                      <div className="stat-icon yellow"><Users size={16} /></div>
-                      <div className="stat-value">{dashboardState.friends.accepted.length}</div>
-                      <div className="stat-label">Friends</div>
-                    </div>
-                    <div className="stat-mini">
-                      <div className="stat-icon blue"><Trophy size={16} /></div>
-                      <div className="stat-value">{formatNumber(dashboardState.stats.stats.highest_score)}</div>
-                      <div className="stat-label">Highscore</div>
-                    </div>
-                  </div>
 
-                  <div className="panel-note">
-                    <Sparkles size={16} />
-                    <span>{isAuthenticated ? "Stats und Progress kommen bereits aus der Dashboard-API. Realtime folgt spaeter." : "Free Game funktioniert schon fuer Guests. Fuer gespeicherten Progress bitte einloggen."}</span>
-                  </div>
-                </aside>
-              </section>
+                    <StatsPanel presentation={sectionPresentation.stats} />
+                  </section>
+                </>
+              )}
             </section>
 
-            <aside className="rail">
-              <div className="rail-list rail-list-top">
-                <div className="avatar avatar-primary"><span className="profile-face profile-face-gold" /></div>
-              </div>
-              <div className="rail-list">
-                {railEntries.map((entry) => (
-                  <div key={entry.id} className={`avatar ${entry.online ? "online" : ""}`} title={entry.label}>
-                    <span className={`avatar-face avatar-face-${entry.accent}`} />
-                  </div>
-                ))}
-              </div>
-              <div className="rail-bottom">
-                <button type="button" className="round-btn dark" onClick={() => setToastMessage("Voice / Party kommt spaeter.")}><Headphones size={17} /></button>
-                <button type="button" className="round-btn alert" onClick={() => setActiveSection("friends")}><Users size={17} /></button>
-                <button type="button" className="ps-badge" onClick={() => setActiveSection("overview")}>PS</button>
-              </div>
-            </aside>
+            <RightRail
+              entries={railEntries}
+              onFriends={() => setActiveSection("friends")}
+              onOverview={() => setActiveSection("overview")}
+              onVoice={() => setToastMessage("Voice / Party kommt spaeter.")}
+            />
           </div>
         </main>
       </div>

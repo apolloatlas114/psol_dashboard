@@ -424,53 +424,97 @@ export function SectionContent({
   }
 
   return (
-    <>
-      <div className="cards-grid">
-        <article className="card stat-card">
-          <div className="mini-icon">
-            <Sparkles size={18} />
+    <section className="overview-left-column-shell overview-home-blueprint">
+      <div className="overview-cards-row">
+        <article className="card overview-card overview-card-progress">
+          <div className="overview-card-glow overview-card-glow-progress" />
+          <div className="overview-card-topline">
+            <div className="mini-icon">
+              <Sparkles size={18} />
+            </div>
+            <span className="overview-dot-badge">Live</span>
           </div>
-          <h3 className="card-title">Progress</h3>
-          <div className="metric-pair">
-            <span>XP</span>
-            <strong>{formatNumber(dashboardState.stats.progress.xp)}</strong>
+          <div className="overview-card-copy">
+            <span className="overview-label">Player Progress</span>
+            <h3 className="card-title">Account Growth</h3>
           </div>
-          <div className="metric-pair">
-            <span>Level</span>
-            <strong>{dashboardState.stats.progress.level}</strong>
-          </div>
-          <div className="metric-pair">
-            <span>Rank</span>
-            <strong>{dashboardState.stats.progress.rank}</strong>
+          <div className="overview-metrics">
+            <div className="overview-metric">
+              <span>XP</span>
+              <strong>{formatNumber(dashboardState.stats.progress.xp)}</strong>
+            </div>
+            <div className="overview-metric">
+              <span>Level</span>
+              <strong>{dashboardState.stats.progress.level}</strong>
+            </div>
+            <div className="overview-metric">
+              <span>Rank</span>
+              <strong>{dashboardState.stats.progress.rank}</strong>
+            </div>
           </div>
         </article>
 
-        <article className="card hub-card">
-          <h3 className="card-title">Dashboard V1</h3>
-          <div className="feature-list">
-            {OVERVIEW_FEATURES.map((feature) => (
-              <div key={feature.title} className="feature-item">
+        <article className="card hub-card overview-card overview-card-featured">
+          <div className="overview-card-glow overview-card-glow-featured" />
+          <div className="overview-card-head">
+            <div>
+              <span className="overview-label">Feature Summary</span>
+              <h3 className="card-title">Dashboard V1</h3>
+            </div>
+            <span className="pill ghost">Ready</span>
+          </div>
+          <div className="feature-list compact">
+            {OVERVIEW_FEATURES.slice(0, 1).map((feature) => (
+              <div key={feature.title} className="feature-item compact">
                 <strong>{feature.title}</strong>
                 <span>{feature.description}</span>
               </div>
             ))}
           </div>
+          <div className="overview-feature-footer">
+            <span>Progress, Match-History und Stats bleiben getrennt.</span>
+          </div>
+        </article>
+
+        <article className="card overview-card overview-card-action">
+          <div className="overview-card-glow overview-card-glow-action" />
+          <div className="overview-action-orb">
+            <ChevronRight size={28} />
+          </div>
+          <div className="overview-card-copy">
+            <span className="overview-label">Quick Action</span>
+            <h3 className="card-title">Free Play First</h3>
+            <p className="card-text">Starte direkt ins Free Game. Member-Features kommen danach sauber dazu.</p>
+          </div>
+          <div className="overview-action-footer">Open instantly</div>
         </article>
       </div>
 
-      <article className="wallet-banner">
-        <div className="wallet-icon">
-          <Wallet size={24} />
-        </div>
-        <div>
-          <div className="wallet-title">Account / Wallet</div>
-          <span className="wallet-tag">Read-only V1</span>
-        </div>
-        <div className="wallet-values">
-          Cash balance: {formatCurrency(dashboardState.wallet.cash_balance)} $
-          <span>SOL balance: {formatCurrency(dashboardState.wallet.sol_balance)} SOL</span>
-        </div>
-      </article>
-    </>
+      <div className="overview-banner-row">
+        <article className="wallet-banner overview-wallet-banner">
+          <div className="wallet-icon">
+            <BriefcaseBusiness size={24} />
+          </div>
+          <div>
+            <div className="wallet-title">Account / Wallet</div>
+            <span className="wallet-tag">Member Dashboard vorbereitet</span>
+          </div>
+          <div className="wallet-values">
+            Free Game bleibt offen. Mit Account werden Wallet, Progress und Match-History sauber verbunden.
+            <span>V1 bleibt read-only und bewusst kompakt.</span>
+          </div>
+          <div className="overview-wallet-actions">
+            <div className="overview-inline-stat">
+              <span>Cash</span>
+              <strong>{formatCurrency(dashboardState.wallet.cash_balance)} $</strong>
+            </div>
+            <div className="overview-inline-stat">
+              <span>Level</span>
+              <strong>{dashboardState.stats.progress.level}</strong>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   );
 }
