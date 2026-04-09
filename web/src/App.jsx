@@ -1,6 +1,5 @@
 import { useDeferredValue, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
 import {
   DASHBOARD_SECTIONS,
   FREE_GAME_WINDOW_FEATURES,
@@ -18,7 +17,6 @@ import { getSectionPresentation } from "./components/dashboard-presentation.jsx"
 import { HeroSection } from "./components/HeroSection.jsx";
 import { OverviewHome } from "./components/OverviewHome.jsx";
 import { Sidebar, Topbar, RightRail } from "./components/ShellParts.jsx";
-import { StatsPanel } from "./components/StatsPanel.jsx";
 
 const FREE_GAME_URL = import.meta.env.VITE_FREE_GAME_URL || "";
 
@@ -463,47 +461,29 @@ function DashboardApp() {
                       }
                     }}
                   />
-
-                  <div className="section-row">
-                    <div className="section-title">{sectionPresentation.title}</div>
-                    <button
-                      type="button"
-                      className="see-more"
-                      onClick={() => (activeSection === "play" ? openFreeGame(setToastMessage) : setToastMessage("Dieser Bereich ist als klares Dashboard-Panel organisiert."))}
-                    >
-                      {sectionPresentation.quickLabel}
-                    </button>
-                    <div className="section-title-right">{sectionPresentation.rightTitle}</div>
-                    <div className="arrow-wrap"><ChevronRight size={18} /></div>
-                  </div>
-
-                  <section className="content-grid">
-                    <div className="content-stack">
-                      {dashboardLoading ? (
-                        <LoadingCard />
-                      ) : sectionBlocked ? (
-                        <GuardCard onLogin={() => setAuthModalMode("login")} />
-                      ) : (
-                        <SectionContent
-                          activeSection={activeSection}
-                          dashboardState={dashboardState}
-                          filteredHistoryItems={filteredHistoryItems}
-                          filteredAcceptedFriends={filteredAcceptedFriends}
-                          filteredIncomingFriends={filteredIncomingFriends}
-                          filteredOutgoingFriends={filteredOutgoingFriends}
-                          filteredBlockedFriends={filteredBlockedFriends}
-                          friendRequestName={friendRequestName}
-                          setFriendRequestName={setFriendRequestName}
-                          onFriendRequest={handleFriendRequest}
-                          onFriendAction={handleFriendAction}
-                          friendBusy={friendBusy}
-                          onOpenAuth={() => setAuthModalMode("login")}
-                          onOpenFreeGame={() => openFreeGame(setToastMessage)}
-                        />
-                      )}
-                    </div>
-
-                    <StatsPanel presentation={sectionPresentation.stats} />
+                  <section className={`section-canvas section-canvas-${activeSection}`}>
+                    {dashboardLoading ? (
+                      <LoadingCard />
+                    ) : sectionBlocked ? (
+                      <GuardCard onLogin={() => setAuthModalMode("login")} />
+                    ) : (
+                      <SectionContent
+                        activeSection={activeSection}
+                        dashboardState={dashboardState}
+                        filteredHistoryItems={filteredHistoryItems}
+                        filteredAcceptedFriends={filteredAcceptedFriends}
+                        filteredIncomingFriends={filteredIncomingFriends}
+                        filteredOutgoingFriends={filteredOutgoingFriends}
+                        filteredBlockedFriends={filteredBlockedFriends}
+                        friendRequestName={friendRequestName}
+                        setFriendRequestName={setFriendRequestName}
+                        onFriendRequest={handleFriendRequest}
+                        onFriendAction={handleFriendAction}
+                        friendBusy={friendBusy}
+                        onOpenAuth={() => setAuthModalMode("login")}
+                        onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      />
+                    )}
                   </section>
                 </>
               )}

@@ -65,21 +65,21 @@ export function getSectionPresentation({
     },
     play: {
       title: "Play",
-      rightTitle: "Mode Snapshot",
-      quickLabel: "Launch",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "play",
-        eyebrow: "Play hub",
+        eyebrow: "PLAY HUB",
         title: "Choose Your Entry",
-        copy: "Starte direkt ins Free Game oder nutze die vorbereiteten Cash-Mode-Einstiege als sauberen Play Hub.",
+        copy: "Free Game bleibt dein direkter Einstieg. Cashgame wird darunter als kompakte Vorschau vorbereitet.",
         badges: ["Play", "Direct", guestChip],
-        footerTitle: "Free Game",
-        footerCopy: "immer sofort im neuen Tab",
+        footerTitle: "Free Game live",
+        footerCopy: "opens in a new tab",
         visualKicker: "PLAY",
-        visualValue: "QUEUE",
-        visualFooter: "quick launch"
+        visualValue: "LIVE",
+        visualFooter: "queue ready"
       },
-      miniCards: sharedMiniCards,
+      miniCards: [],
       stats: {
         label: "Ready modes",
         value: 3,
@@ -94,25 +94,21 @@ export function getSectionPresentation({
     },
     inventory: {
       title: "Inventory / Rewards",
-      rightTitle: "Inventory Stats",
-      quickLabel: "Collection",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "inventory",
-        eyebrow: "Inventory hub",
+        eyebrow: "INVENTORY HUB",
         title: "Skins and Rewards",
-        copy: "Behalte ausgeruestete Items, Belohnungen und Besitzstaende in einem klar getrennten Inventory-Bereich.",
-        badges: ["Inventory", "Rewards", guestChip],
-        footerTitle: `${inventory.total_items}`,
-        footerCopy: "owned items in V1",
+        copy: "Deine gewonnenen und gekauften Skins bleiben sichtbar, kompakt und schnell scanbar statt in schweren Datenboxen.",
+        badges: ["Owned", "Rewards", guestChip],
+        footerTitle: `${inventory.total_items} skins`,
+        footerCopy: "equipped and owned",
         visualKicker: "LOADOUT",
-        visualValue: "DROP",
-        visualFooter: "owned | equipped | rewards"
+        visualValue: "OWNED",
+        visualFooter: "equipped | rarity"
       },
-      miniCards: [
-        { id: "equipped", title: "Equipped", subtitle: `${inventory.equipped.length} active items`, accent: "free", action: "noop" },
-        { id: "owned", title: "Owned Items", subtitle: `${inventory.total_items} in inventory`, accent: "team", action: "noop" },
-        { id: "rewards", title: "Rewards", subtitle: "battle pass ready later", accent: "coop", action: "noop" }
-      ],
+      miniCards: [],
       stats: {
         label: "Owned items",
         value: inventory.total_items,
@@ -125,27 +121,52 @@ export function getSectionPresentation({
         variant: "inventory"
       }
     },
+    marketplace: {
+      title: "Marketplace",
+      rightTitle: "",
+      quickLabel: "",
+      hero: {
+        variant: "marketplace",
+        eyebrow: "TRADING FLOOR",
+        title: "Skin Marketplace",
+        copy: "Buy bleibt der Standard. Filter, Sortierung und Skin-Karten stehen direkt im Fokus statt unter großen Platzhaltern.",
+        badges: ["Buy", "Filter", guestChip],
+        footerTitle: "Buy default",
+        footerCopy: "sell stays secondary",
+        visualKicker: "MARKET",
+        visualValue: "LISTED",
+        visualFooter: "buy | sell | floor"
+      },
+      miniCards: [],
+      stats: {
+        label: "Market volume",
+        value: inventory.total_items || 12,
+        meta: "buy state",
+        metrics: [
+          asMetric("Listed", inventory.items.length || 12),
+          asMetric("Owned", inventory.total_items),
+          asMetric("Floor", 1)
+        ],
+        variant: "marketplace"
+      }
+    },
     history: {
       title: "Match-History",
-      rightTitle: "Activity Totals",
-      quickLabel: "Activity",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "history",
-        eyebrow: "Recent activity",
+        eyebrow: "RECENT ACTIVITY",
         title: "Match Activity",
-        copy: "Deine letzten Sessions, Scores und Rewards laufen hier sauber getrennt als Activity-Ansicht zusammen.",
-        badges: ["History", "Timeline", guestChip],
-        footerTitle: `${history.total}`,
-        footerCopy: "logged matches",
+        copy: "Letzte Sessions, Placements und Rewards laufen hier als ruhiger Feed statt als Tabellen- oder Card-Chaos.",
+        badges: ["History", "Feed", guestChip],
+        footerTitle: `${history.total} rows`,
+        footerCopy: "recent sessions",
         visualKicker: "MATCH",
         visualValue: "LOG",
         visualFooter: "recent | score | rewards"
       },
-      miniCards: [
-        { id: "last-match", title: "Last Match", subtitle: history.items[0]?.mode || "Noch kein Match", accent: "free", action: "noop" },
-        { id: "best-score", title: "Best Score", subtitle: `${stats.highest_score || 0} peak score`, accent: "team", action: "noop" },
-        { id: "xp-flow", title: "XP Flow", subtitle: `${progress.xp || 0} total xp`, accent: "coop", action: "noop" }
-      ],
+      miniCards: [],
       stats: {
         label: "Matches logged",
         value: history.total,
@@ -160,25 +181,21 @@ export function getSectionPresentation({
     },
     stats: {
       title: "Stats / Progress",
-      rightTitle: "Progress Snapshot",
-      quickLabel: "Breakdown",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "stats",
-        eyebrow: "Progression",
+        eyebrow: "PROGRESSION",
         title: "Rank and Progress",
-        copy: "Growth, XP, Rank und Performance sind hier bewusst getrennt aufbereitet und nicht mehr in dieselbe Ecke gequetscht.",
-        badges: ["Stats", "XP", guestChip],
+        copy: "Growth und Performance bleiben getrennt, dicht und schnell lesbar, ohne wieder in drei konkurrierende Module zu kippen.",
+        badges: ["Progress", "Performance", guestChip],
         footerTitle: `Lvl ${progress.level}`,
         footerCopy: `${progress.rank} rank`,
         visualKicker: "RANK",
-        visualValue: "UP",
-        visualFooter: "xp | rank | best"
+        visualValue: progress.level,
+        visualFooter: "level"
       },
-      miniCards: [
-        { id: "xp", title: "XP", subtitle: `${progress.xp} total`, accent: "free", action: "noop" },
-        { id: "level", title: "Level", subtitle: `${progress.level} current`, accent: "team", action: "noop" },
-        { id: "rank", title: "Rank", subtitle: `${progress.rank}`, accent: "coop", action: "noop" }
-      ],
+      miniCards: [],
       stats: {
         label: "Total XP",
         value: progress.xp,
@@ -193,25 +210,21 @@ export function getSectionPresentation({
     },
     wallet: {
       title: "Wallet",
-      rightTitle: "Finance Summary",
-      quickLabel: "Read-only",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "wallet",
-        eyebrow: "Wallet overview",
+        eyebrow: "WALLET OVERVIEW",
         title: "Balances and Pending States",
-        copy: "Die Wallet bleibt in V1 read-only, bekommt aber eine klare eigene Flaeche statt wie vorher nur ein Restbanner zu sein.",
-        badges: ["Wallet", "V1", "Read-only"],
-        footerTitle: `${wallet.cash_balance}`,
+        copy: "Read-only bleibt klar sichtbar. Die vier Kernwerte sitzen darunter in einem einzigen flachen Finance-Strip.",
+        badges: ["Wallet", "Read-only", guestChip],
+        footerTitle: `${wallet.cash_balance} $`,
         footerCopy: "cash balance",
         visualKicker: "FUNDS",
         visualValue: "SAFE",
         visualFooter: "cash | sol | pending"
       },
-      miniCards: [
-        { id: "cash", title: "Cash", subtitle: `${wallet.cash_balance} $ available`, accent: "free", action: "noop" },
-        { id: "sol", title: "SOL", subtitle: `${wallet.sol_balance} SOL`, accent: "team", action: "noop" },
-        { id: "pending", title: "Pending", subtitle: `${wallet.pending_deposits + wallet.pending_withdrawals} total`, accent: "coop", action: "noop" }
-      ],
+      miniCards: [],
       stats: {
         label: "Wallet total",
         value: wallet.cash_balance,
@@ -226,25 +239,21 @@ export function getSectionPresentation({
     },
     friends: {
       title: "Friends",
-      rightTitle: "Social Snapshot",
-      quickLabel: "Requests",
+      rightTitle: "",
+      quickLabel: "",
       hero: {
         variant: "friends",
-        eyebrow: "Social hub",
+        eyebrow: "SOCIAL HUB",
         title: "Friends and Requests",
-        copy: "Friend Requests, Annahmen und Block-Status laufen hier als eigener Social-Bereich statt als Restpanel.",
-        badges: ["Friends", "Social", guestChip],
+        copy: "Requests bekommen Vorrang. Connected bleibt die Hauptliste. Blocked ist nur noch sekundär statt ein eigener großer Bereich.",
+        badges: ["Requests", "Connected", guestChip],
         footerTitle: `${acceptedFriends.length}`,
         footerCopy: "accepted friends",
         visualKicker: "SQUAD",
         visualValue: username,
         visualFooter: "accepted | incoming | blocked"
       },
-      miniCards: [
-        { id: "accepted", title: "Accepted", subtitle: `${acceptedFriends.length} connected`, accent: "free", action: "noop" },
-        { id: "incoming", title: "Incoming", subtitle: `${incomingFriends.length} requests`, accent: "team", action: "noop" },
-        { id: "blocked", title: "Blocked", subtitle: `${blockedFriends.length} blocked`, accent: "coop", action: "noop" }
-      ],
+      miniCards: [],
       stats: {
         label: "Network",
         value: acceptedFriends.length,

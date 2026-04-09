@@ -1,41 +1,147 @@
-import { ChevronRight, ShieldCheck } from "lucide-react";
+import { Coins, Gem, History, ShieldCheck, ShoppingBag, Sparkles, Users, Wallet } from "lucide-react";
+
+function renderVisual(hero) {
+  switch (hero.variant) {
+    case "play":
+      return (
+        <div className="section-hero-visual-stack visual-play">
+          <div className="visual-play-monitor">
+            <span className="visual-dot visual-dot-cyan" />
+            <span className="visual-dot visual-dot-pink" />
+            <span className="visual-dot visual-dot-gold" />
+          </div>
+          <div className="visual-play-rows">
+            <div>
+              <strong>Free Game</strong>
+              <span>Live now</span>
+            </div>
+            <div>
+              <strong>Cashgame</strong>
+              <span>Coming soon</span>
+            </div>
+          </div>
+        </div>
+      );
+    case "inventory":
+      return (
+        <div className="section-hero-visual-stack visual-inventory">
+          {["Epic", "Rare", "Owned"].map((label, index) => (
+            <div key={label} className={`visual-skin-mini visual-skin-mini-${index + 1}`}>
+              <Gem size={18} />
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      );
+    case "marketplace":
+      return (
+        <div className="section-hero-visual-stack visual-market">
+          <div className="visual-market-toolbar">
+            <span className="visual-market-pill active">Buy</span>
+            <span className="visual-market-pill">Epic</span>
+            <span className="visual-market-pill">Low price</span>
+          </div>
+          <div className="visual-market-card">
+            <ShoppingBag size={18} />
+            <div>
+              <strong>Alien Donut</strong>
+              <span>Floor starts at $1.00</span>
+            </div>
+          </div>
+        </div>
+      );
+    case "history":
+      return (
+        <div className="section-hero-visual-stack visual-history">
+          {["Free Game · #4 · +80 XP", "Coop · #2 · +120 XP", "Team Battle · #9 · +40 XP"].map((row) => (
+            <div key={row} className="visual-feed-row">
+              <History size={14} />
+              <span>{row}</span>
+            </div>
+          ))}
+        </div>
+      );
+    case "stats":
+      return (
+        <div className="section-hero-visual-stack visual-stats">
+          <div className="visual-mini-ring">
+            <div>
+              <strong>{hero.visualValue}</strong>
+              <span>{hero.visualFooter}</span>
+            </div>
+          </div>
+          <div className="visual-metric-chip">
+            <Sparkles size={16} />
+            <span>{hero.footerTitle}</span>
+          </div>
+        </div>
+      );
+    case "wallet":
+      return (
+        <div className="section-hero-visual-stack visual-wallet">
+          <div className="visual-vial">
+            <div className="visual-vial-fluid" />
+          </div>
+          <div className="visual-wallet-strip">
+            <span>Cash</span>
+            <span>SOL</span>
+            <span>Pending</span>
+          </div>
+        </div>
+      );
+    case "friends":
+      return (
+        <div className="section-hero-visual-stack visual-friends">
+          <div className="visual-friend-row">
+            <span className="visual-avatar" />
+            <div>
+              <strong>Requests</strong>
+              <span>Prioritized first</span>
+            </div>
+          </div>
+          <div className="visual-friend-row">
+            <span className="visual-avatar visual-avatar-alt" />
+            <div>
+              <strong>Connected</strong>
+              <span>Main list stays compact</span>
+            </div>
+          </div>
+        </div>
+      );
+    default:
+      return (
+        <div className="section-hero-visual-stack visual-generic">
+          <Sparkles size={18} />
+          <span>{hero.visualFooter}</span>
+        </div>
+      );
+  }
+}
 
 export function HeroSection({ hero, miniCards, onMiniCardAction }) {
+  const hasSide = miniCards.length > 0;
+
   return (
-    <section className={`hero-grid hero-grid-${hero.variant}`}>
-      <article className={`hero-card hero-card-${hero.variant}`}>
-        <div className="hero-backdrop hero-backdrop-a" />
-        <div className="hero-backdrop hero-backdrop-b" />
-        <div className="hero-backdrop hero-backdrop-c" />
-
-        <div className="hero-content">
-          <div className="hero-copy">
-            <div className="chips">
-              {hero.badges.map((badge) => (
-                <span key={badge} className={`chip ${badge === "Popular" ? "popular" : "small"}`}>
-                  {badge === "Popular" ? <span className="chip-ring" /> : null}
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <div className="hero-logo hero-logo-dynamic">
-              <span>{hero.title}</span>
-              <span className="hero-logo-sub">{hero.eyebrow}</span>
-            </div>
-
-            <div className="hero-text">{hero.copy}</div>
+    <section className={`section-hero section-hero-compact ${hasSide ? "section-hero-with-side" : "section-hero-solo"} section-hero-${hero.variant}`}>
+      <article className={`section-hero-card section-hero-card-${hero.variant}`}>
+        <div className="section-hero-copy">
+          <div className="section-hero-badges">
+            {hero.badges.slice(0, 3).map((badge) => (
+              <span key={badge} className="section-hero-badge">
+                {badge}
+              </span>
+            ))}
           </div>
 
-          <div className="hero-footer">
-            <div className="bubbles">
-              <span className="bubble bubble-blue" />
-              <span className="bubble bubble-pink" />
-              <span className="bubble bubble-green" />
-            </div>
+          <div className="section-hero-copy-stack">
+            <span className="section-hero-eyebrow">{hero.eyebrow}</span>
+            <h1 className="section-hero-title">{hero.title}</h1>
+            <p className="section-hero-summary">{hero.copy}</p>
+          </div>
 
-            <div className="reviews">
-              <ShieldCheck size={16} />
+          <div className="section-hero-meta">
+            <div className="section-hero-note">
+              {hero.variant === "wallet" ? <Wallet size={14} /> : hero.variant === "inventory" || hero.variant === "marketplace" ? <ShoppingBag size={14} /> : hero.variant === "friends" ? <Users size={14} /> : hero.variant === "play" ? <ShieldCheck size={14} /> : <Coins size={14} />}
               <div>
                 <strong>{hero.footerTitle}</strong>
                 <span>{hero.footerCopy}</span>
@@ -44,41 +150,22 @@ export function HeroSection({ hero, miniCards, onMiniCardAction }) {
           </div>
         </div>
 
-        <div className={`hero-visual hero-visual-${hero.variant}`}>
-          <div className="hero-visual-poster" />
-          <div className="hero-visual-orbit hero-visual-orbit-main" />
-          <div className="hero-visual-orbit hero-visual-orbit-sub" />
-          <div className="hero-visual-card">
-            <span className="hero-visual-kicker">{hero.visualKicker}</span>
-            <strong>{hero.visualValue}</strong>
-            <span className="hero-visual-footer">{hero.visualFooter}</span>
-          </div>
-        </div>
+        <div className={`section-hero-visual section-hero-visual-${hero.variant}`}>{renderVisual(hero)}</div>
       </article>
 
-      <aside className={`hero-side hero-side-${hero.variant}`}>
-        <div className="dots">
-          <span />
-          <span />
-          <span />
-        </div>
-
-        {miniCards.map((card) => (
-          <button
-            key={card.id}
-            type="button"
-            className={`side-card side-card-${card.id}`}
-            onClick={() => onMiniCardAction(card)}
-          >
-            <div className={`cover ${card.accent}`} />
-            <div className="side-copy">
-              <div className="side-title">{card.title}</div>
-              <div className="side-sub">{card.subtitle}</div>
-            </div>
-            <ChevronRight size={18} />
-          </button>
-        ))}
-      </aside>
+      {hasSide ? (
+        <aside className="section-hero-side">
+          {miniCards.map((card) => (
+            <button key={card.id} type="button" className="section-side-card" onClick={() => onMiniCardAction(card)}>
+              <span className={`section-side-dot ${card.accent}`} />
+              <div className="section-side-copy">
+                <strong>{card.title}</strong>
+                <span>{card.subtitle}</span>
+              </div>
+            </button>
+          ))}
+        </aside>
+      ) : null}
     </section>
   );
 }

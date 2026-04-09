@@ -1,0 +1,101 @@
+.fx-glass-panel {
+  background: rgba(22, 16, 44, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 20px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.fx-glass-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.fx-glass-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(180, 146, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.fx-glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.fx-toggle-group {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(70px, auto));
+  padding: 4px;
+  gap: 6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fx-toggle-group button {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.fx-toggle-group button.active {
+  background: linear-gradient(135deg, rgba(114, 120, 255, 0.86), rgba(208, 84, 255, 0.72));
+  color: white;
+  box-shadow: 0 10px 22px rgba(107, 108, 255, 0.28);
+}
+
+.fx-glow-button {
+  --glow-color: rgba(217, 176, 255, 0.88);
+  --glow-spread-color: rgba(191, 123, 255, 0.3);
+  --btn-color: rgba(88, 53, 136, 0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(214, 178, 255, 0.72);
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  background: linear-gradient(180deg, rgba(116, 73, 179, 0.98), rgba(84, 48, 144, 0.98));
+  box-shadow:
+    0 0 0.9em 0 rgba(217, 176, 255, 0.22),
+    0 0 2.2em 0 rgba(191, 123, 255, 0.15),
+    inset 0 0 0.4em 0 rgba(255, 255, 255, 0.2);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.fx-glow-button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 1em 0 rgba(217, 176, 255, 0.3),
+    0 0 2.8em 0 rgba(191, 123, 255, 0.18),
+    inset 0 0 0.5em 0 rgba(255, 255, 255, 0.24);
+}
+
+.fx-glow-button:active {
+  transform: translateY(0);
+}

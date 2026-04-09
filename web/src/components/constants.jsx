@@ -5,13 +5,15 @@ import {
   Home,
   MessageCircle,
   MonitorPlay,
-  PieChart
+  PieChart,
+  Store
 } from "lucide-react";
 
 export const iconMap = {
   home: Home,
   gamepad: Gamepad2,
   gift: Gift,
+  store: Store,
   tv: MonitorPlay,
   chart: PieChart,
   briefcase: BriefcaseBusiness,
@@ -22,6 +24,7 @@ export const sectionTitles = {
   overview: "Overview",
   play: "Play",
   inventory: "Inventory / Rewards",
+  marketplace: "Marketplace",
   history: "Match-History",
   stats: "Stats / Progress",
   wallet: "Wallet",

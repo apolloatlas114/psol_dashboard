@@ -1,5 +1,24 @@
-import { BriefcaseBusiness, ChevronRight, Coins, Gift, PieChart, ShieldCheck, Sparkles, Swords, Trophy, Users, Wallet } from "lucide-react";
-import { GAME_MODE_CARDS, OVERVIEW_FEATURES } from "@shared/index.js";
+import {
+  Activity,
+  ArrowRightLeft,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Clock3,
+  Coins,
+  Gem,
+  Gift,
+  Heart,
+  Search,
+  Send,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+  Store,
+  Swords,
+  Trophy,
+  Users,
+  Wallet
+} from "lucide-react";
 import { formatCurrency, formatDuration, formatNumber } from "../lib/formatters.js";
 
 function EmptyPanel({ title, copy }) {
@@ -11,29 +30,103 @@ function EmptyPanel({ title, copy }) {
   );
 }
 
-function FriendColumn({ title, items, emptyText, actions }) {
+function Segment({ label, value, helper }) {
   return (
-    <div className="friend-column">
-      <div className="friend-column-head">
-        <strong>{title}</strong>
-        <span>{items.length}</span>
+    <div className="flat-segment">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {helper ? <small>{helper}</small> : null}
+    </div>
+  );
+}
+
+function SkinTile({ title, status, meta, rarity }) {
+  return (
+    <article className="showcase-skin-card">
+      <div className="showcase-skin-frame" />
+      <div className={`showcase-skin-visual rarity-${rarity || "common"}`}>
+        <Gem size={42} strokeWidth={1.5} />
       </div>
-      {items.length ? (
-        <div className="friend-column-list">
-          {items.map((item) => (
-            <div key={item.id} className="friend-item">
-              <div className="friend-avatar" />
-              <div className="friend-copy">
-                <strong>{item.username || item.email || "Unknown"}</strong>
-                <span>{item.email || item.friend_state}</span>
-              </div>
-              <div className="friend-actions">{actions ? actions(item) : null}</div>
-            </div>
-          ))}
+      <strong className="showcase-skin-title">{title}</strong>
+      <span className="showcase-skin-status">{status}</span>
+      {meta ? <small className="showcase-skin-meta">{meta}</small> : null}
+      <div className="showcase-skin-social">
+        <button type="button" className="showcase-icon-button" aria-label="Like skin">
+          <Heart size={14} />
+        </button>
+        <button type="button" className="showcase-icon-button" aria-label="Share skin">
+          <Share2 size={14} />
+        </button>
+        <button type="button" className="showcase-icon-button" aria-label="Send skin">
+          <Send size={14} />
+        </button>
+      </div>
+      <button type="button" className="fx-glow-button showcase-cta">
+        Equip Skin
+      </button>
+    </article>
+  );
+}
+
+function MarketplaceTile({ item }) {
+  return (
+    <article className="showcase-market-card">
+      <div className="showcase-skin-frame" />
+      <div className={`showcase-skin-visual showcase-skin-visual-market rarity-${item.rarity || "common"}`}>
+        <div className="showcase-skin-stars" />
+        <div className="showcase-skin-floater">
+          <Gem size={56} strokeWidth={1.35} />
         </div>
-      ) : (
-        <div className="friend-empty">{emptyText}</div>
-      )}
+      </div>
+      <div className="showcase-market-copy">
+        <strong className="showcase-skin-title">{item.name}</strong>
+        <ul className="showcase-market-bullets">
+          {item.bullets.map((bullet) => (
+            <li key={bullet}>{bullet}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="showcase-skin-social">
+        <button type="button" className="showcase-icon-button" aria-label="Like market item">
+          <Heart size={14} />
+        </button>
+        <button type="button" className="showcase-icon-button" aria-label="Share market item">
+          <Share2 size={14} />
+        </button>
+        <button type="button" className="showcase-icon-button" aria-label="Send market item">
+          <Send size={14} />
+        </button>
+      </div>
+      <div className="showcase-market-footer">
+        <div className="showcase-market-price">
+          <strong>{item.price}</strong>
+          <small>{item.status}</small>
+        </div>
+        <button type="button" className="fx-glow-button showcase-cta">
+          {item.action}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function FriendRows({ items, emptyText, actions }) {
+  if (!items.length) {
+    return <div className="friend-empty">{emptyText}</div>;
+  }
+
+  return (
+    <div className="friend-rows">
+      {items.map((item) => (
+        <div key={item.id} className="friend-row-slim">
+          <div className="friend-avatar" />
+          <div className="friend-row-copy">
+            <strong>{item.username || item.email || "Unknown"}</strong>
+            <span>{item.email || item.friend_state}</span>
+          </div>
+          <div className="friend-row-actions">{actions ? actions(item) : null}</div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -86,315 +179,239 @@ export function SectionContent({
   onOpenAuth,
   onOpenFreeGame
 }) {
+  const progress = dashboardState.stats.progress;
+  const performance = dashboardState.stats.stats;
+  const inventory = dashboardState.inventory;
+  const wallet = dashboardState.wallet;
+
+  const inventoryTiles = inventory.items.map((item) => ({
+    id: item.id,
+    title: item.item_key,
+    status: item.item_type,
+    meta: `x${item.quantity}`,
+    rarity: item.rarity || "common"
+  }));
+
+  const marketItems = (inventoryTiles.length ? inventoryTiles : [
+    { id: "m1", title: "Alien Donut", status: "Epic", meta: "Tradable", rarity: "epic" },
+    { id: "m2", title: "Neon Slime", status: "Rare", meta: "Animated Glow", rarity: "rare" },
+    { id: "m3", title: "Void Core", status: "Common", meta: "Browser Wallet", rarity: "common" }
+  ])
+    .flatMap((item, index) =>
+      Array.from({ length: inventoryTiles.length ? 1 : 3 }, (_, duplicateIndex) => ({
+        id: `${item.id}-${duplicateIndex}`,
+        title: item.title,
+        status: item.status,
+        meta: item.meta,
+        rarity: item.rarity,
+        order: index * 3 + duplicateIndex
+      }))
+    )
+    .map((item, index) => ({
+    id: item.id,
+    name: item.title,
+    rarity: item.rarity,
+    bullets: [item.status, item.meta || "Tradable", "Browser Wallet"].slice(0, 3),
+    price: index === 0 ? "$1.90" : index === 1 ? "$1.25" : "$0.95",
+    status: index === 0 ? "Buy" : "Listed",
+    action: index === 0 ? "Buy now" : "Buy"
+  }));
+
   if (activeSection === "play") {
     return (
-      <>
-        <article className="card mode-card">
-          <div className="card-header-inline">
-            <h3 className="card-title">Game Modes</h3>
-            <span className="pill ghost">Free first</span>
+      <section className="page-lower page-lower-play">
+        <article className="flat-action-bar">
+          <div className="flat-action-copy">
+            <span className="flat-kicker">Free Game Action</span>
+            <strong>Jump straight into the live browser lobby</strong>
+            <small>Opens in a new tab and keeps the dashboard lightweight.</small>
           </div>
-          <div className="mode-list">
-            {GAME_MODE_CARDS.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                className={`mode-list-item ${mode.locked ? "locked" : ""}`}
-                onClick={() => {
-                  if (mode.id === "free") {
-                    onOpenFreeGame();
-                    return;
-                  }
-                  onOpenAuth();
-                }}
-              >
-                <div className={`cover ${mode.accent}`} />
-                <div className="mode-list-copy">
-                  <strong>{mode.title}</strong>
-                  <span>{mode.description}</span>
-                </div>
-                <ChevronRight size={18} />
-              </button>
-            ))}
-          </div>
+          <button type="button" className="fx-glow-button play-launch-button" onClick={onOpenFreeGame}>
+            Open Free Game
+          </button>
         </article>
 
-        <article className="card hub-card">
-          <div className="card-header-inline">
-            <h3 className="card-title">Launch Rules</h3>
-            <span className="pill ghost">V1</span>
+        <article className="promo-banner promo-banner-cash">
+          <div className="promo-copy">
+            <span className="flat-kicker">Cashgame - $1 Buy-in</span>
+            <strong>Coming Soon</strong>
+            <ul className="compact-point-list">
+              <li>50 players per lobby</li>
+              <li>20 min match</li>
+              <li>Top 22 get $1 back</li>
+              <li>Top 3 split the remaining pool by placement</li>
+            </ul>
           </div>
-          <ul className="plain-list">
-            <li>Free Game startet direkt in neuem Tab.</li>
-            <li>Cash Modes bleiben vorbereitet, bis Wallet und Queue-Logik live sind.</li>
-            <li>Gast-User sehen das Dashboard, aber nur Member speichern Progress und Stats.</li>
-          </ul>
-        </article>
-
-        <article className="wallet-banner">
-          <div className="wallet-icon">
-            <Swords size={24} />
-          </div>
-          <div>
-            <div className="wallet-title">Instant Play</div>
-            <span className="wallet-tag">No API needed for Free Game link</span>
-          </div>
-          <div className="wallet-values">
-            Free Game ist direkt clientseitig konfiguriert.
-            <span>Wenn spaeter Region oder Maintenance-Logik kommt, kann daraus ein API-Case werden.</span>
-          </div>
-          <div className="wallet-actions">
-            <button type="button" className="action-button play" onClick={onOpenFreeGame}>
-              <ChevronRight size={16} />
-            </button>
+          <div className="promo-side">
+            <span className="promo-badge">$1 Buy-in</span>
+            <div className="promo-prize-box">
+              <span>Top 22</span>
+              <strong>$1 refund</strong>
+              <small>Top 3 split pool</small>
+            </div>
           </div>
         </article>
-      </>
+      </section>
     );
   }
 
   if (activeSection === "inventory") {
     return (
-      <>
-        <article className="card stat-card">
-          <div className="card-header-inline">
-            <h3 className="card-title">Inventory Summary</h3>
-            <span className="pill">{dashboardState.inventory.total_items} items</span>
-          </div>
-          {dashboardState.inventory.items.length ? (
-            <div className="token-grid">
-              {dashboardState.inventory.items.map((item) => (
-                <div key={item.id} className="token-card">
-                  <span className={`token-swatch rarity-${item.rarity || "common"}`} />
-                  <strong>{item.item_key}</strong>
-                  <span>
-                    {item.item_type} x{item.quantity}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyPanel
-              title="Noch keine Items"
-              copy="Inventory ist bereits als API vorbereitet. Sobald das Spiel Items oder Skins nach Supabase schreibt, erscheinen sie hier."
-            />
-          )}
-        </article>
+      <section className="page-lower page-lower-inventory">
+        <div className="flat-strip flat-strip-three">
+          <Segment label="Equipped" value={inventory.equipped.length} helper="active skins" />
+          <Segment label="Owned" value={inventory.total_items} helper="total items" />
+          <Segment
+            label="Rarity"
+            value={inventory.items.filter((item) => item.rarity === "rare" || item.rarity === "epic").length}
+            helper="rare + epic"
+          />
+        </div>
 
-        <article className="card hub-card">
-          <div className="card-header-inline">
-            <h3 className="card-title">Equipped Slots</h3>
-            <span className="pill ghost">Read-only</span>
+        {inventoryTiles.length ? (
+          <div className="skin-grid-wrap">
+            {inventoryTiles.map((item) => (
+              <SkinTile key={item.id} title={item.title} status={item.status} meta={item.meta} rarity={item.rarity} />
+            ))}
           </div>
-          {dashboardState.inventory.equipped.length ? (
-            <div className="token-grid compact">
-              {dashboardState.inventory.equipped.map((item) => (
-                <div key={item.id} className="token-card compact">
-                  <span className={`token-swatch rarity-${item.rarity || "common"}`} />
-                  <strong>{item.item_key}</strong>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyPanel
-              title="Keine aktiven Cosmetics"
-              copy="Ausruestung bleibt in V1 bewusst schlank, damit spaeter keine Gameplay-Logik am Dashboard haengt."
-            />
-          )}
-        </article>
+        ) : (
+          <EmptyPanel
+            title="Noch keine Skins"
+            copy="Sobald Free Game Rewards oder Marketplace-Kaeufe geschrieben werden, erscheinen die Visual-Cards hier automatisch."
+          />
+        )}
+      </section>
+    );
+  }
 
-        <article className="wallet-banner">
-          <div className="wallet-icon">
-            <Gift size={24} />
+  if (activeSection === "marketplace") {
+    return (
+      <section className="page-lower page-lower-marketplace">
+        <div className="market-toolbar">
+          <label className="market-toolbar-field fx-glass-input">
+            <Search size={14} />
+            <input placeholder="Search skin" readOnly value="" />
+          </label>
+          <button type="button" className="market-chip fx-glass-chip">Sort by price</button>
+          <button type="button" className="market-chip fx-glass-chip">Filter rarity</button>
+          <button type="button" className="market-chip fx-glass-chip">Filter price</button>
+          <div className="market-toggle fx-toggle-group">
+            <button type="button" className="active">Buy</button>
+            <button type="button">Sell</button>
           </div>
-          <div>
-            <div className="wallet-title">Rewards / Battle Pass spaeter</div>
-            <span className="wallet-tag">Bestehender Sidebar-Slot sinnvoll genutzt</span>
-          </div>
-          <div className="wallet-values">
-            Inventory und Rewards teilen sich V1 einen kompakten Bereich statt zwei aufgeblasene Menues.
-            <span>Das spart Platz und haelt die Navigation nahe am Mockup.</span>
-          </div>
-        </article>
-      </>
+        </div>
+
+        <div className="market-grid">
+          {marketItems.map((item) => (
+            <MarketplaceTile key={item.id} item={item} />
+          ))}
+        </div>
+      </section>
     );
   }
 
   if (activeSection === "history") {
     return (
-      <article className="large-panel history-panel">
-        <div className="card-header-inline">
-          <h3 className="card-title">Match History</h3>
-          <span className="pill">
-            {dashboardState.history.total} total / page {dashboardState.history.page}
-          </span>
-        </div>
+      <section className="page-lower page-lower-history">
         {filteredHistoryItems.length ? (
-          <div className="history-list">
+          <div className="history-feed">
             {filteredHistoryItems.map((match) => (
-              <div key={match.id} className="history-row">
-                <div>
-                  <strong>{match.mode || "Unknown mode"}</strong>
-                  <span>{new Date(match.played_at).toLocaleString("de-DE")}</span>
-                </div>
-                <div>
-                  <strong>#{match.placement ?? "-"}</strong>
-                  <span>Placement</span>
-                </div>
-                <div>
-                  <strong>{formatNumber(match.score)}</strong>
-                  <span>Score</span>
-                </div>
-                <div>
-                  <strong>{match.kills ?? 0}</strong>
-                  <span>Kills</span>
-                </div>
-                <div>
-                  <strong>+{match.xp_gained ?? 0} XP</strong>
-                  <span>{match.reward_label || "No reward"}</span>
-                </div>
+              <div key={match.id} className="history-feed-row">
+                <strong>{match.mode || "Unknown"}</strong>
+                <span>#{match.placement ?? "-"}</span>
+                <span>{formatNumber(match.score)}</span>
+                <span>{match.kills ?? 0} kills</span>
+                <span>+{match.xp_gained ?? 0} XP</span>
               </div>
             ))}
           </div>
         ) : (
           <EmptyPanel
             title="Noch keine Matches"
-            copy="Die Response ist bereits empty-state-faehig. Sobald das Spiel Matchdaten schreibt, kann hier ohne Frontend-Umbau paginiert werden."
+            copy="Sobald Matchdaten geschrieben werden, tauchen sie hier als kompakter Activity-Feed auf."
           />
         )}
-      </article>
+      </section>
     );
   }
 
   if (activeSection === "stats") {
-    const performance = dashboardState.stats.stats;
-    const progress = dashboardState.stats.progress;
     const kdRatio = performance.deaths ? (performance.kills / performance.deaths).toFixed(2) : performance.kills.toFixed(2);
 
     return (
-      <>
-        <div className="cards-grid">
-          <article className="card stat-card">
-            <div className="mini-icon">
-              <Trophy size={18} />
-            </div>
-            <h3 className="card-title">Performance</h3>
-            <div className="metric-pair">
-              <span>Games</span>
-              <strong>{performance.games_played}</strong>
-            </div>
-            <div className="metric-pair">
-              <span>Wins</span>
-              <strong>{performance.wins}</strong>
-            </div>
-            <div className="metric-pair">
-              <span>K/D</span>
-              <strong>{kdRatio}</strong>
-            </div>
-          </article>
-
-          <article className="card hub-card">
-            <div className="mini-icon">
-              <Sparkles size={18} />
-            </div>
-            <h3 className="card-title">Progress</h3>
-            <div className="metric-pair">
-              <span>XP</span>
-              <strong>{formatNumber(progress.xp)}</strong>
-            </div>
-            <div className="metric-pair">
-              <span>Level</span>
-              <strong>{progress.level}</strong>
-            </div>
-            <div className="metric-pair">
-              <span>Rank</span>
-              <strong>{progress.rank}</strong>
-            </div>
-          </article>
-        </div>
-
-        <article className="wallet-banner">
-          <div className="wallet-icon">
-            <PieChart size={24} />
+      <section className="page-lower page-lower-stats">
+        <article className="metric-block">
+          <div className="metric-block-head">
+            <Sparkles size={16} />
+            <span>Progress</span>
           </div>
-          <div>
-            <div className="wallet-title">Stats vs Progress bleibt getrennt</div>
-            <span className="wallet-tag">Growth und Performance laufen bewusst ueber eigene Datenbereiche</span>
-          </div>
-          <div className="wallet-values">
-            Highest Score: {formatNumber(performance.highest_score)}
-            <span>
-              Highest Mass: {formatNumber(performance.highest_mass)} / Time Played: {formatDuration(performance.time_played_seconds)}
-            </span>
+          <div className="metric-block-main">
+            <div className="mini-ring">
+              <div className="mini-ring-center">
+                <strong>{progress.level}</strong>
+                <span>Level</span>
+              </div>
+            </div>
+            <div className="metric-inline-row">
+              <Segment label="XP" value={formatNumber(progress.xp)} />
+              <Segment label="Level" value={progress.level} />
+              <Segment label="Rank" value={progress.rank} />
+            </div>
           </div>
         </article>
-      </>
+
+        <article className="metric-block">
+          <div className="metric-block-head">
+            <Trophy size={16} />
+            <span>Performance</span>
+          </div>
+          <div className="metric-inline-row metric-inline-row-four">
+            <Segment label="Games" value={performance.games_played} />
+            <Segment label="Wins" value={performance.wins} />
+            <Segment label="K/D" value={kdRatio} />
+            <Segment label="Highscore" value={formatNumber(performance.highest_score)} />
+          </div>
+        </article>
+      </section>
     );
   }
 
   if (activeSection === "wallet") {
     return (
-      <>
-        <div className="cards-grid">
-          <article className="card stat-card">
-            <div className="mini-icon">
-              <Wallet size={18} />
-            </div>
-            <h3 className="card-title">Cash Balance</h3>
-            <div className="money-value">{formatCurrency(dashboardState.wallet.cash_balance)} $</div>
-            <p className="card-text">Read-only in V1, damit spaeter echte Deposit- und Withdraw-Logik sauber andocken kann.</p>
-          </article>
-
-          <article className="card hub-card">
-            <div className="mini-icon">
-              <Coins size={18} />
-            </div>
-            <h3 className="card-title">SOL Balance</h3>
-            <div className="money-value">{formatCurrency(dashboardState.wallet.sol_balance)} SOL</div>
-            <p className="card-text">Pending Deposits und Pending Withdrawals sind als Datenform schon vorbereitet.</p>
-          </article>
+      <section className="page-lower page-lower-wallet">
+        <div className="flat-strip flat-strip-four">
+          <Segment label="Cash" value={`${formatCurrency(wallet.cash_balance)} $`} />
+          <Segment label="SOL" value={`${formatCurrency(wallet.sol_balance)} SOL`} />
+          <Segment label="Pending deposits" value={formatCurrency(wallet.pending_deposits)} />
+          <Segment label="Pending withdrawals" value={formatCurrency(wallet.pending_withdrawals)} />
         </div>
-
-        <article className="wallet-banner">
-          <div className="wallet-icon">
-            <BriefcaseBusiness size={24} />
-          </div>
-          <div>
-            <div className="wallet-title">Pending Flow</div>
-            <span className="wallet-tag">Wallet V1 ist absichtlich read-only</span>
-          </div>
-          <div className="wallet-values">
-            Pending deposits: {formatCurrency(dashboardState.wallet.pending_deposits)}
-            <span>Pending withdrawals: {formatCurrency(dashboardState.wallet.pending_withdrawals)}</span>
-          </div>
-        </article>
-      </>
+      </section>
     );
   }
 
   if (activeSection === "friends") {
     return (
-      <article className="large-panel friends-panel">
-        <div className="card-header-inline">
-          <h3 className="card-title">Friend Requests</h3>
-          <span className="pill ghost">ohne Realtime</span>
-        </div>
+      <section className="page-lower page-lower-friends">
+        <article className="friend-pane">
+          <div className="friend-pane-head">
+            <div>
+              <span className="flat-kicker">Requests</span>
+              <strong>Incoming first</strong>
+            </div>
+            <span className="friend-pane-count">{filteredIncomingFriends.length}</span>
+          </div>
 
-        <form className="friend-form" onSubmit={onFriendRequest}>
-          <label>
-            Username
-            <input value={friendRequestName} onChange={(event) => setFriendRequestName(event.target.value)} placeholder="friend_username" />
-          </label>
-          <button type="submit" className="primary-button" disabled={friendBusy}>
-            {friendBusy ? "Senden..." : "Request senden"}
-          </button>
-        </form>
+          <form className="friend-form friend-form-slim" onSubmit={onFriendRequest}>
+            <label>
+              <input value={friendRequestName} onChange={(event) => setFriendRequestName(event.target.value)} placeholder="friend_username" />
+            </label>
+            <button type="submit" className="primary-button" disabled={friendBusy}>
+              {friendBusy ? "Senden..." : "Request senden"}
+            </button>
+          </form>
 
-        <div className="friends-columns">
-          <FriendColumn title="Accepted" items={filteredAcceptedFriends} emptyText="Noch keine Friends." />
-          <FriendColumn
-            title="Incoming"
-            items={filteredIncomingFriends}
+          <FriendRows
+            items={filteredIncomingFriends.slice(0, 6)}
             emptyText="Keine eingehenden Requests."
             actions={(item) => (
               <>
@@ -407,114 +424,31 @@ export function SectionContent({
               </>
             )}
           />
-          <FriendColumn
-            title="Outgoing"
-            items={filteredOutgoingFriends}
-            emptyText="Keine offenen Requests."
-            actions={(item) => (
-              <button type="button" className="mini-action block" onClick={() => onFriendAction(item.id, "block")}>
-                Block
-              </button>
-            )}
-          />
-          <FriendColumn title="Blocked" items={filteredBlockedFriends} emptyText="Niemand blockiert." />
-        </div>
-      </article>
+        </article>
+
+        <article className="friend-pane">
+          <div className="friend-pane-head">
+            <div>
+              <span className="flat-kicker">Connected</span>
+              <strong>Main list</strong>
+            </div>
+            <span className="friend-pane-count">{filteredAcceptedFriends.length}</span>
+          </div>
+
+          <FriendRows items={filteredAcceptedFriends.slice(0, 6)} emptyText="Noch keine Friends." />
+
+          <div className="friend-secondary-meta">
+            <span>Outgoing: {filteredOutgoingFriends.length}</span>
+            <span>Blocked: {filteredBlockedFriends.length}</span>
+          </div>
+        </article>
+      </section>
     );
   }
 
   return (
-    <section className="overview-left-column-shell overview-home-blueprint">
-      <div className="overview-cards-row">
-        <article className="card overview-card overview-card-progress">
-          <div className="overview-card-glow overview-card-glow-progress" />
-          <div className="overview-card-topline">
-            <div className="mini-icon">
-              <Sparkles size={18} />
-            </div>
-            <span className="overview-dot-badge">Live</span>
-          </div>
-          <div className="overview-card-copy">
-            <span className="overview-label">Player Progress</span>
-            <h3 className="card-title">Account Growth</h3>
-          </div>
-          <div className="overview-metrics">
-            <div className="overview-metric">
-              <span>XP</span>
-              <strong>{formatNumber(dashboardState.stats.progress.xp)}</strong>
-            </div>
-            <div className="overview-metric">
-              <span>Level</span>
-              <strong>{dashboardState.stats.progress.level}</strong>
-            </div>
-            <div className="overview-metric">
-              <span>Rank</span>
-              <strong>{dashboardState.stats.progress.rank}</strong>
-            </div>
-          </div>
-        </article>
-
-        <article className="card hub-card overview-card overview-card-featured">
-          <div className="overview-card-glow overview-card-glow-featured" />
-          <div className="overview-card-head">
-            <div>
-              <span className="overview-label">Feature Summary</span>
-              <h3 className="card-title">Dashboard V1</h3>
-            </div>
-            <span className="pill ghost">Ready</span>
-          </div>
-          <div className="feature-list compact">
-            {OVERVIEW_FEATURES.slice(0, 1).map((feature) => (
-              <div key={feature.title} className="feature-item compact">
-                <strong>{feature.title}</strong>
-                <span>{feature.description}</span>
-              </div>
-            ))}
-          </div>
-          <div className="overview-feature-footer">
-            <span>Progress, Match-History und Stats bleiben getrennt.</span>
-          </div>
-        </article>
-
-        <article className="card overview-card overview-card-action">
-          <div className="overview-card-glow overview-card-glow-action" />
-          <div className="overview-action-orb">
-            <ChevronRight size={28} />
-          </div>
-          <div className="overview-card-copy">
-            <span className="overview-label">Quick Action</span>
-            <h3 className="card-title">Free Play First</h3>
-            <p className="card-text">Starte direkt ins Free Game. Member-Features kommen danach sauber dazu.</p>
-          </div>
-          <div className="overview-action-footer">Open instantly</div>
-        </article>
-      </div>
-
-      <div className="overview-banner-row">
-        <article className="wallet-banner overview-wallet-banner">
-          <div className="wallet-icon">
-            <BriefcaseBusiness size={24} />
-          </div>
-          <div>
-            <div className="wallet-title">Account / Wallet</div>
-            <span className="wallet-tag">Member Dashboard vorbereitet</span>
-          </div>
-          <div className="wallet-values">
-            Free Game bleibt offen. Mit Account werden Wallet, Progress und Match-History sauber verbunden.
-            <span>V1 bleibt read-only und bewusst kompakt.</span>
-          </div>
-          <div className="overview-wallet-actions">
-            <div className="overview-inline-stat">
-              <span>Cash</span>
-              <strong>{formatCurrency(dashboardState.wallet.cash_balance)} $</strong>
-            </div>
-            <div className="overview-inline-stat">
-              <span>Level</span>
-              <strong>{dashboardState.stats.progress.level}</strong>
-            </div>
-          </div>
-        </article>
-      </div>
+    <section className="page-lower page-lower-overview-fallback">
+      <EmptyPanel title="Overview bleibt oben" copy="Die Main-Dashboard-Seite nutzt ihre eigene Home-Struktur und wird hier nicht mehr verdoppelt." />
     </section>
   );
 }

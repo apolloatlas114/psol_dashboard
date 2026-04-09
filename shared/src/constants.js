@@ -2,6 +2,7 @@ export const DASHBOARD_SECTIONS = [
   { id: "overview", label: "Home", icon: "home", protected: false },
   { id: "play", label: "Play", icon: "gamepad", protected: false },
   { id: "inventory", label: "Inventory", icon: "gift", protected: true },
+  { id: "marketplace", label: "Marketplace", icon: "store", protected: true },
   { id: "history", label: "History", icon: "tv", protected: true },
   { id: "stats", label: "Stats", icon: "chart", protected: true },
   { id: "wallet", label: "Wallet", icon: "briefcase", protected: true },
