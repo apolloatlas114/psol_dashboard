@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="ring" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#ffe29c"/>
+      <stop offset="55%" stop-color="#8f7dff"/>
+      <stop offset="100%" stop-color="#1e0d42"/>
+    </radialGradient>
+    <linearGradient id="shard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cfff9b"/>
+      <stop offset="100%" stop-color="#5cc400"/>
+    </linearGradient>
+    <filter id="coreShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <g filter="url(#coreShadow)">
+    <circle cx="160" cy="160" r="102" fill="url(#ring)"/>
+    <circle cx="160" cy="160" r="52" fill="#090410"/>
+    <path d="M160 34l22 67h70l-57 42 21 67-56-41-56 41 21-67-57-42h70z" fill="url(#shard)" opacity="0.9"/>
+    <path d="M90 86l24 19-16 29-31-7z" fill="#8af700"/>
+    <path d="M231 90l28 37-28 8-18-30z" fill="#8af700"/>
+    <path d="M71 226l40-15 8 34-29 23z" fill="#bb89ff"/>
+    <path d="M245 213l11 43-31 10-20-25z" fill="#bb89ff"/>
+  </g>
+</svg>

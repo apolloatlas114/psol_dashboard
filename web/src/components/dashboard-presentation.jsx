@@ -71,10 +71,13 @@ export function getSectionPresentation({
         variant: "play",
         eyebrow: "PLAY HUB",
         title: "Choose Your Entry",
-        copy: "Free Game bleibt dein direkter Einstieg. Cashgame wird darunter als kompakte Vorschau vorbereitet.",
-        badges: ["Play", "Direct", guestChip],
+        copy: "Free Game bleibt dein direkter Einstieg. Cashgame wird rechts vorbereitet und darunter kompakt erklaert.",
+        badges: ["Free Game", "Cashgame", guestChip],
         footerTitle: "Free Game live",
         footerCopy: "opens in a new tab",
+        visualAsset: "/overview-free-game-alien-neon-latest.png?v=hero6",
+        secondaryTitle: "Cashgame - $1 Buy-in",
+        secondaryCopy: "Banner folgt noch",
         visualKicker: "PLAY",
         visualValue: "LIVE",
         visualFooter: "queue ready"
@@ -90,6 +93,35 @@ export function getSectionPresentation({
           asMetric("Matches", history.total)
         ],
         variant: "play"
+      }
+    },
+    profile: {
+      title: "Profile",
+      rightTitle: "",
+      quickLabel: "",
+      hero: {
+        variant: "profile",
+        eyebrow: "ACCOUNT CORE",
+        title: "Profile and Progress",
+        copy: "Account, wallet snapshot, rank and performance sitzen hier gebuendelt auf einer einzigen Seite statt in Profil-Drawer plus extra Stats-Menuepunkt.",
+        badges: ["Profile", "Progress", guestChip],
+        footerTitle: currentUser?.email || "No email",
+        footerCopy: `${progress.rank} • Level ${progress.level}`,
+        visualKicker: "PROFILE",
+        visualValue: progress.level,
+        visualFooter: "rank and progress"
+      },
+      miniCards: [],
+      stats: {
+        label: "Profile level",
+        value: progress.level,
+        meta: progress.rank,
+        metrics: [
+          asMetric("XP", progress.xp),
+          asMetric("Wins", stats.wins),
+          asMetric("Cash", wallet.cash_balance)
+        ],
+        variant: "profile"
       }
     },
     inventory: {
@@ -177,35 +209,6 @@ export function getSectionPresentation({
           asMetric("Best", stats.highest_score)
         ],
         variant: "history"
-      }
-    },
-    stats: {
-      title: "Stats / Progress",
-      rightTitle: "",
-      quickLabel: "",
-      hero: {
-        variant: "stats",
-        eyebrow: "PROGRESSION",
-        title: "Rank and Progress",
-        copy: "Growth und Performance bleiben getrennt, dicht und schnell lesbar, ohne wieder in drei konkurrierende Module zu kippen.",
-        badges: ["Progress", "Performance", guestChip],
-        footerTitle: `Lvl ${progress.level}`,
-        footerCopy: `${progress.rank} rank`,
-        visualKicker: "RANK",
-        visualValue: progress.level,
-        visualFooter: "level"
-      },
-      miniCards: [],
-      stats: {
-        label: "Total XP",
-        value: progress.xp,
-        meta: `Level ${progress.level}`,
-        metrics: [
-          asMetric("Wins", stats.wins),
-          asMetric("K/D", stats.deaths ? (stats.kills / stats.deaths).toFixed(2) : stats.kills.toFixed(2)),
-          asMetric("Mass", stats.highest_mass)
-        ],
-        variant: "stats"
       }
     },
     wallet: {

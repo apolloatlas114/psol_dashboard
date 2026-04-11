@@ -89,6 +89,26 @@ function renderVisual(hero) {
           </div>
         </div>
       );
+    case "profile":
+      return (
+        <div className="section-hero-visual-stack visual-profile">
+          <div className="visual-profile-avatar">
+            <span className="profile-face profile-face-gold" />
+          </div>
+          <div className="visual-profile-meta">
+            <div className="visual-mini-ring">
+              <div>
+                <strong>{hero.visualValue}</strong>
+                <span>Level</span>
+              </div>
+            </div>
+            <div className="visual-metric-chip">
+              <ShieldCheck size={16} />
+              <span>{hero.visualFooter}</span>
+            </div>
+          </div>
+        </div>
+      );
     case "friends":
       return (
         <div className="section-hero-visual-stack visual-friends">
@@ -119,6 +139,42 @@ function renderVisual(hero) {
 }
 
 export function HeroSection({ hero, miniCards, onMiniCardAction }) {
+  if (hero.variant === "play") {
+    return (
+      <section className="play-hub-top">
+        <article
+          className="play-banner play-banner-free"
+          style={{ backgroundImage: `url(${hero.visualAsset})` }}
+        >
+          <div className="play-banner-copy">
+            <div className="play-banner-badges">
+              <span className="section-hero-badge">Collect XP</span>
+              <span className="section-hero-badge">Boss Hunt</span>
+              <span className="section-hero-badge">Squad Up</span>
+            </div>
+            <span className="play-banner-eyebrow">ZERO BUY-IN<br />SURVIVAL MODE</span>
+            <div className="play-banner-title-row">
+              <h1 className="play-banner-title">PlaySol Free Game</h1>
+              <div className="play-banner-cta">
+                <strong>Free Run</strong>
+                <span>Level 1 stays linked</span>
+              </div>
+            </div>
+            <p className="play-banner-summary">Drop back in, stack XP, hunt bosses and survive the arena.</p>
+          </div>
+        </article>
+
+        <article className="play-banner play-banner-cash">
+          <div className="play-banner-cash-inner">
+            <span className="play-banner-placeholder-pill">Coming Soon</span>
+            <strong>{hero.secondaryTitle}</strong>
+            <p>{hero.secondaryCopy}</p>
+          </div>
+        </article>
+      </section>
+    );
+  }
+
   const hasSide = miniCards.length > 0;
 
   return (

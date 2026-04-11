@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="core" cx="50%" cy="38%" r="56%">
+      <stop offset="0%" stop-color="#c8f7ff"/>
+      <stop offset="40%" stop-color="#4fd6ff"/>
+      <stop offset="100%" stop-color="#15325f"/>
+    </radialGradient>
+    <radialGradient id="slime" cx="48%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#f6a5ff"/>
+      <stop offset="44%" stop-color="#ff53c6"/>
+      <stop offset="100%" stop-color="#53164b"/>
+    </radialGradient>
+    <filter id="orbShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <g filter="url(#orbShadow)">
+    <circle cx="162" cy="156" r="102" fill="url(#core)"/>
+    <path d="M72 170c18 34 62 81 99 79 38-2 76-34 93-79-17 57-46 81-98 86-54 4-84-28-94-86z" fill="url(#slime)" opacity="0.82"/>
+    <ellipse cx="128" cy="108" rx="24" ry="16" fill="#ffffff" opacity="0.55"/>
+    <circle cx="205" cy="132" r="20" fill="#0d1a38" opacity="0.85"/>
+    <circle cx="206" cy="132" r="10" fill="#f9fcff" opacity="0.7"/>
+    <path d="M101 223c0 0 20 27 22 49" fill="none" stroke="#ff6fd9" stroke-width="10" stroke-linecap="round"/>
+    <path d="M146 237c0 0 13 31 12 48" fill="none" stroke="#ff6fd9" stroke-width="8" stroke-linecap="round"/>
+    <path d="M194 228c0 0 17 24 20 40" fill="none" stroke="#ff6fd9" stroke-width="9" stroke-linecap="round"/>
+  </g>
+</svg>

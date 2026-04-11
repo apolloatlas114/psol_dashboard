@@ -11,7 +11,7 @@ import { apiRequest, getDashboardBootstrap } from "./lib/api.js";
 import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
 import { placeholderRail } from "./components/constants.jsx";
 import { defaultDashboardState } from "./components/dashboard-defaults.jsx";
-import { AuthModal, LoadingScreen, NotificationDrawer, ProfileModal, UsernameModal } from "./components/Overlays.jsx";
+import { AuthModal, LoadingScreen, NotificationDrawer, UsernameModal } from "./components/Overlays.jsx";
 import { GuardCard, LoadingCard, SectionContent } from "./components/SectionContent.jsx";
 import { getSectionPresentation } from "./components/dashboard-presentation.jsx";
 import { HeroSection } from "./components/HeroSection.jsx";
@@ -100,7 +100,6 @@ function DashboardApp() {
   const [needsUsernameCompletion, setNeedsUsernameCompletion] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [authModalMode, setAuthModalMode] = useState(null);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -268,7 +267,6 @@ function DashboardApp() {
     }
 
     await supabase.auth.signOut();
-    setProfileOpen(false);
     setToastMessage("Du bist jetzt ausgeloggt.");
   }
 
@@ -390,6 +388,19 @@ function DashboardApp() {
     incomingFriends: filteredIncomingFriends,
     blockedFriends: filteredBlockedFriends
   });
+  const handleMiniCardAction = (card) => {
+    if (card.action === "launch-free") {
+      openFreeGame(setToastMessage);
+      return;
+    }
+    if (card.action === "protected" && !isAuthenticated) {
+      setAuthModalMode("login");
+      return;
+    }
+    if (card.action !== "noop") {
+      setToastMessage(`${card.title} bleibt in V1 vorbereitet.`);
+    }
+  };
 
   if (booting || (location.pathname === "/auth/callback" && !session)) {
     return <LoadingScreen title="Dashboard wird geladen" copy="Session und Dashboard-Daten werden gerade vorbereitet." />;
@@ -418,7 +429,7 @@ function DashboardApp() {
                 onSearchChange={setSearchQuery}
                 onFreeGame={() => openFreeGame(setToastMessage)}
                 onNotifications={() => setNotificationsOpen(true)}
-                onProfile={() => (isAuthenticated ? setProfileOpen(true) : setAuthModalMode("login"))}
+                onProfile={() => (isAuthenticated ? setActiveSection("profile") : setAuthModalMode("login"))}
               />
 
               {activeSection === "overview" && dashboardLoading ? (
@@ -428,38 +439,105 @@ function DashboardApp() {
                   presentation={sectionPresentation}
                   dashboardState={dashboardState}
                   onQuickAction={() => openFreeGame(setToastMessage)}
-                  onMiniCardAction={(card) => {
-                    if (card.action === "launch-free") {
-                      openFreeGame(setToastMessage);
-                      return;
-                    }
-                    if (card.action === "protected" && !isAuthenticated) {
-                      setAuthModalMode("login");
-                      return;
-                    }
-                    if (card.action !== "noop") {
-                      setToastMessage(`${card.title} bleibt in V1 vorbereitet.`);
-                    }
-                  }}
+                  onMiniCardAction={handleMiniCardAction}
                 />
+              ) : activeSection === "marketplace" ? (
+                <section className="section-canvas section-canvas-marketplace-full">
+                  <HeroSection
+                    hero={sectionPresentation.hero}
+                    miniCards={sectionPresentation.miniCards}
+                    onMiniCardAction={handleMiniCardAction}
+                  />
+                  {dashboardLoading ? (
+                    <LoadingCard />
+                  ) : sectionBlocked ? (
+                    <GuardCard onLogin={() => setAuthModalMode("login")} />
+                  ) : (
+                    <SectionContent
+                      activeSection={activeSection}
+                      dashboardState={dashboardState}
+                      currentUser={currentUser}
+                      filteredHistoryItems={filteredHistoryItems}
+                      filteredAcceptedFriends={filteredAcceptedFriends}
+                      filteredIncomingFriends={filteredIncomingFriends}
+                      filteredOutgoingFriends={filteredOutgoingFriends}
+                      filteredBlockedFriends={filteredBlockedFriends}
+                      friendRequestName={friendRequestName}
+                      setFriendRequestName={setFriendRequestName}
+                      onFriendRequest={handleFriendRequest}
+                      onFriendAction={handleFriendAction}
+                      friendBusy={friendBusy}
+                      onOpenAuth={() => setAuthModalMode("login")}
+                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onLogout={handleLogout}
+                    />
+                  )}
+                </section>
+              ) : activeSection === "play" ? (
+                <section className="section-canvas section-canvas-play-full">
+                  <HeroSection
+                    hero={sectionPresentation.hero}
+                    miniCards={sectionPresentation.miniCards}
+                    onMiniCardAction={handleMiniCardAction}
+                  />
+                  {dashboardLoading ? (
+                    <LoadingCard />
+                  ) : sectionBlocked ? (
+                    <GuardCard onLogin={() => setAuthModalMode("login")} />
+                  ) : (
+                    <SectionContent
+                      activeSection={activeSection}
+                      dashboardState={dashboardState}
+                      currentUser={currentUser}
+                      filteredHistoryItems={filteredHistoryItems}
+                      filteredAcceptedFriends={filteredAcceptedFriends}
+                      filteredIncomingFriends={filteredIncomingFriends}
+                      filteredOutgoingFriends={filteredOutgoingFriends}
+                      filteredBlockedFriends={filteredBlockedFriends}
+                      friendRequestName={friendRequestName}
+                      setFriendRequestName={setFriendRequestName}
+                      onFriendRequest={handleFriendRequest}
+                      onFriendAction={handleFriendAction}
+                      friendBusy={friendBusy}
+                      onOpenAuth={() => setAuthModalMode("login")}
+                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onLogout={handleLogout}
+                    />
+                  )}
+                </section>
+              ) : activeSection === "profile" ? (
+                <section className="section-canvas section-canvas-profile-full">
+                  {dashboardLoading ? (
+                    <LoadingCard />
+                  ) : sectionBlocked ? (
+                    <GuardCard onLogin={() => setAuthModalMode("login")} />
+                  ) : (
+                    <SectionContent
+                      activeSection={activeSection}
+                      dashboardState={dashboardState}
+                      currentUser={currentUser}
+                      filteredHistoryItems={filteredHistoryItems}
+                      filteredAcceptedFriends={filteredAcceptedFriends}
+                      filteredIncomingFriends={filteredIncomingFriends}
+                      filteredOutgoingFriends={filteredOutgoingFriends}
+                      filteredBlockedFriends={filteredBlockedFriends}
+                      friendRequestName={friendRequestName}
+                      setFriendRequestName={setFriendRequestName}
+                      onFriendRequest={handleFriendRequest}
+                      onFriendAction={handleFriendAction}
+                      friendBusy={friendBusy}
+                      onOpenAuth={() => setAuthModalMode("login")}
+                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onLogout={handleLogout}
+                    />
+                  )}
+                </section>
               ) : (
                 <>
                   <HeroSection
                     hero={sectionPresentation.hero}
                     miniCards={sectionPresentation.miniCards}
-                    onMiniCardAction={(card) => {
-                      if (card.action === "launch-free") {
-                        openFreeGame(setToastMessage);
-                        return;
-                      }
-                      if (card.action === "protected" && !isAuthenticated) {
-                        setAuthModalMode("login");
-                        return;
-                      }
-                      if (card.action !== "noop") {
-                        setToastMessage(`${card.title} bleibt in V1 vorbereitet.`);
-                      }
-                    }}
+                    onMiniCardAction={handleMiniCardAction}
                   />
                   <section className={`section-canvas section-canvas-${activeSection}`}>
                     {dashboardLoading ? (
@@ -468,23 +546,25 @@ function DashboardApp() {
                       <GuardCard onLogin={() => setAuthModalMode("login")} />
                     ) : (
                       <SectionContent
-                        activeSection={activeSection}
-                        dashboardState={dashboardState}
-                        filteredHistoryItems={filteredHistoryItems}
-                        filteredAcceptedFriends={filteredAcceptedFriends}
-                        filteredIncomingFriends={filteredIncomingFriends}
+                      activeSection={activeSection}
+                      dashboardState={dashboardState}
+                      currentUser={currentUser}
+                      filteredHistoryItems={filteredHistoryItems}
+                      filteredAcceptedFriends={filteredAcceptedFriends}
+                      filteredIncomingFriends={filteredIncomingFriends}
                         filteredOutgoingFriends={filteredOutgoingFriends}
                         filteredBlockedFriends={filteredBlockedFriends}
                         friendRequestName={friendRequestName}
                         setFriendRequestName={setFriendRequestName}
                         onFriendRequest={handleFriendRequest}
                         onFriendAction={handleFriendAction}
-                        friendBusy={friendBusy}
-                        onOpenAuth={() => setAuthModalMode("login")}
-                        onOpenFreeGame={() => openFreeGame(setToastMessage)}
-                      />
-                    )}
-                  </section>
+                      friendBusy={friendBusy}
+                      onOpenAuth={() => setAuthModalMode("login")}
+                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onLogout={handleLogout}
+                    />
+                  )}
+                </section>
                 </>
               )}
             </section>
@@ -501,7 +581,6 @@ function DashboardApp() {
 
       {toastMessage ? <div className="toast">{toastMessage}</div> : null}
       {authModalMode ? <AuthModal mode={authModalMode} onSwitchMode={setAuthModalMode} authForm={authForm} setAuthForm={setAuthForm} onClose={() => !authBusy && (setAuthModalMode(null), setAuthError(""))} authBusy={authBusy} authError={authError} onSubmit={handleEmailAuth} onGoogle={handleGoogleAuth} /> : null}
-      {profileOpen ? <ProfileModal user={currentUser} profile={dashboardState.profile} wallet={dashboardState.wallet} onClose={() => setProfileOpen(false)} onLogout={handleLogout} /> : null}
       {notificationsOpen ? <NotificationDrawer onClose={() => setNotificationsOpen(false)} items={NOTIFICATION_ITEMS} /> : null}
       {needsUsernameCompletion ? <UsernameModal usernameDraft={usernameDraft} setUsernameDraft={setUsernameDraft} usernameBusy={usernameBusy} usernameSubmitError={usernameSubmitError} onSubmit={handleUsernameSubmit} /> : null}
     </div>

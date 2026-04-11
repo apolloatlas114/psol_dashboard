@@ -1,14 +1,16 @@
-import { Bell, Headphones, Plus, Search, Swords, Users } from "lucide-react";
+import { Bell, Headphones, Plus, Search, Users } from "lucide-react";
 import { DASHBOARD_SECTIONS } from "@shared/index.js";
 import { iconMap } from "./constants.jsx";
 
 export function Sidebar({ activeSection, isAuthenticated, onOpenAuth, onSectionChange, onFreeGame }) {
   return (
     <aside className="sidebar">
-      <div className="brand">PS</div>
+      <div className="sidebar-logo-header">
+        <img src="/playsol-logo.png" alt="PlaySol" className="sidebar-logo-large" />
+      </div>
 
       <div className="nav-stack">
-        {DASHBOARD_SECTIONS.map((section) => {
+        {DASHBOARD_SECTIONS.filter((section) => section.id !== "friends" && section.id !== "profile").map((section) => {
           const Icon = iconMap[section.icon];
           const locked = section.protected && !isAuthenticated;
           return (
@@ -45,10 +47,6 @@ export function Topbar({ greetingName, isAuthenticated, searchQuery, onSearchCha
         <Search size={18} />
         <input value={searchQuery} onChange={(event) => onSearchChange(event.target.value)} placeholder="Search dashboard" />
       </label>
-
-      <button type="button" className="top-icon" onClick={onFreeGame} title="Free Game">
-        <Swords size={18} />
-      </button>
 
       <button type="button" className="top-icon notify" onClick={onNotifications} title="Notifications">
         <Bell size={18} />

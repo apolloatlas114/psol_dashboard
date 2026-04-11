@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <linearGradient id="body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7d1ff"/>
+      <stop offset="44%" stop-color="#b249ff"/>
+      <stop offset="100%" stop-color="#351051"/>
+    </linearGradient>
+    <linearGradient id="horn" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f5ffb0"/>
+      <stop offset="100%" stop-color="#80d600"/>
+    </linearGradient>
+    <filter id="hornShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="15" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <g filter="url(#hornShadow)">
+    <path d="M55 194c0-74 56-132 126-132 59 0 112 39 128 95 18 61-1 118-64 135-70 19-190-5-190-98z" fill="url(#body)"/>
+    <path d="M194 46c9-18 28-32 53-33-11 18-16 40-9 55 9 18 28 28 46 26-11 13-25 22-43 24-21 2-41-8-51-27-9-16-8-31 4-45z" fill="url(#horn)"/>
+    <circle cx="130" cy="164" r="36" fill="#8fff22"/>
+    <circle cx="130" cy="164" r="18" fill="#261e0f"/>
+    <path d="M187 177c19-15 48-11 62 9 14 21 8 48-13 63-20 15-48 10-63-10-15-19-8-47 14-62z" fill="#171221" opacity="0.84"/>
+    <path d="M105 238c19 25 46 42 77 49" fill="none" stroke="#93ff2d" stroke-width="9" stroke-linecap="round"/>
+    <path d="M91 103c-20 14-34 34-40 58" fill="none" stroke="#93ff2d" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

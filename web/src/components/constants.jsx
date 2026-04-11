@@ -1,21 +1,21 @@
 import {
   BriefcaseBusiness,
+  CircleUserRound,
   Gamepad2,
   Gift,
   Home,
   MessageCircle,
   MonitorPlay,
-  PieChart,
   Store
 } from "lucide-react";
 
 export const iconMap = {
   home: Home,
   gamepad: Gamepad2,
+  user: CircleUserRound,
   gift: Gift,
   store: Store,
   tv: MonitorPlay,
-  chart: PieChart,
   briefcase: BriefcaseBusiness,
   chat: MessageCircle
 };
@@ -23,10 +23,10 @@ export const iconMap = {
 export const sectionTitles = {
   overview: "Overview",
   play: "Play",
+  profile: "Profile",
   inventory: "Inventory / Rewards",
   marketplace: "Marketplace",
   history: "Match-History",
-  stats: "Stats / Progress",
   wallet: "Wallet",
   friends: "Friends"
 };
