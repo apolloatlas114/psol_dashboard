@@ -15,5 +15,8 @@ export const config = {
   frontendOrigin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
   supabaseUrl: required("SUPABASE_URL"),
   supabaseAnonKey: required("SUPABASE_ANON_KEY"),
-  supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY")
+  supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
+  gameLaunchTokenSecret: required("GAME_LAUNCH_TOKEN_SECRET", "local-launch-secret"),
+  gameServerWritebackSecret: required("GAME_SERVER_WRITEBACK_SECRET", "local-writeback-secret"),
+  freeGameUrl: process.env.FREE_GAME_URL || "http://localhost:5000"
 };

@@ -14,9 +14,11 @@ router.get(
         id: request.authUser.id,
         email: profile?.email || request.authUser.email || null,
         username: profile?.username || null,
+        display_name: profile?.display_name || profile?.username || null,
         avatar_url: profile?.avatar_url || null,
         created_at: profile?.created_at || null,
-        last_login_at: profile?.last_login_at || null
+        last_login_at: profile?.last_login_at || null,
+        last_seen_at: profile?.last_seen_at || null
       },
       needs_username_completion: !profile?.username
     });

@@ -55,4 +55,14 @@ export async function getDashboardBootstrap(token) {
   };
 }
 
+export async function startFreeGameSession(token) {
+  const response = await apiRequest("/api/game-sessions/free/start", {
+    method: "POST",
+    token,
+    body: token ? {} : { guest: true }
+  });
+
+  return response.data;
+}
+
 export { API_BASE_URL };

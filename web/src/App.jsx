@@ -7,7 +7,7 @@ import {
   normalizeUsername,
   usernameError
 } from "@shared/index.js";
-import { apiRequest, getDashboardBootstrap } from "./lib/api.js";
+import { apiRequest, getDashboardBootstrap, startFreeGameSession } from "./lib/api.js";
 import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
 import { placeholderRail } from "./components/constants.jsx";
 import { defaultDashboardState } from "./components/dashboard-defaults.jsx";
@@ -17,17 +17,6 @@ import { getSectionPresentation } from "./components/dashboard-presentation.jsx"
 import { HeroSection } from "./components/HeroSection.jsx";
 import { OverviewHome } from "./components/OverviewHome.jsx";
 import { Sidebar, Topbar, RightRail } from "./components/ShellParts.jsx";
-
-const FREE_GAME_URL = import.meta.env.VITE_FREE_GAME_URL || "";
-
-function openFreeGame(notify) {
-  if (!FREE_GAME_URL) {
-    notify("VITE_FREE_GAME_URL fehlt noch in deiner Web-Config.");
-    return;
-  }
-
-  window.open(FREE_GAME_URL, "_blank", FREE_GAME_WINDOW_FEATURES);
-}
 
 function AuthCallback() {
   return <LoadingScreen title="Google Login wird abgeschlossen" copy="Die Session wird gerade geladen und danach direkt ins Dashboard uebernommen." />;
@@ -203,6 +192,19 @@ function DashboardApp() {
       ...currentState,
       friends: response.data
     }));
+  }
+
+  async function handleOpenFreeGame() {
+    try {
+      const launch = await startFreeGameSession(session?.access_token || "");
+      const targetUrl = launch?.launch_url || "";
+      if (!targetUrl) {
+        throw new Error("Die Dashboard-API hat keine Free-Game-URL geliefert.");
+      }
+      window.open(targetUrl, "_blank", FREE_GAME_WINDOW_FEATURES);
+    } catch (error) {
+      setToastMessage(error.message || "Free Game konnte nicht gestartet werden.");
+    }
   }
 
   async function handleEmailAuth(mode) {
@@ -390,7 +392,7 @@ function DashboardApp() {
   });
   const handleMiniCardAction = (card) => {
     if (card.action === "launch-free") {
-      openFreeGame(setToastMessage);
+      handleOpenFreeGame();
       return;
     }
     if (card.action === "protected" && !isAuthenticated) {
@@ -418,7 +420,7 @@ function DashboardApp() {
               isAuthenticated={isAuthenticated}
               onOpenAuth={() => setAuthModalMode("login")}
               onSectionChange={setActiveSection}
-              onFreeGame={() => openFreeGame(setToastMessage)}
+              onFreeGame={handleOpenFreeGame}
             />
 
             <section className={`main-panel main-panel-${activeSection}`}>
@@ -427,7 +429,7 @@ function DashboardApp() {
                 isAuthenticated={isAuthenticated}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
-                onFreeGame={() => openFreeGame(setToastMessage)}
+                onFreeGame={handleOpenFreeGame}
                 onNotifications={() => setNotificationsOpen(true)}
                 onProfile={() => (isAuthenticated ? setActiveSection("profile") : setAuthModalMode("login"))}
               />
@@ -438,7 +440,7 @@ function DashboardApp() {
                 <OverviewHome
                   presentation={sectionPresentation}
                   dashboardState={dashboardState}
-                  onQuickAction={() => openFreeGame(setToastMessage)}
+                  onQuickAction={handleOpenFreeGame}
                   onMiniCardAction={handleMiniCardAction}
                 />
               ) : activeSection === "marketplace" ? (
@@ -468,7 +470,7 @@ function DashboardApp() {
                       onFriendAction={handleFriendAction}
                       friendBusy={friendBusy}
                       onOpenAuth={() => setAuthModalMode("login")}
-                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onOpenFreeGame={handleOpenFreeGame}
                       onLogout={handleLogout}
                     />
                   )}
@@ -500,7 +502,7 @@ function DashboardApp() {
                       onFriendAction={handleFriendAction}
                       friendBusy={friendBusy}
                       onOpenAuth={() => setAuthModalMode("login")}
-                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onOpenFreeGame={handleOpenFreeGame}
                       onLogout={handleLogout}
                     />
                   )}
@@ -527,7 +529,7 @@ function DashboardApp() {
                       onFriendAction={handleFriendAction}
                       friendBusy={friendBusy}
                       onOpenAuth={() => setAuthModalMode("login")}
-                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onOpenFreeGame={handleOpenFreeGame}
                       onLogout={handleLogout}
                     />
                   )}
@@ -560,7 +562,7 @@ function DashboardApp() {
                         onFriendAction={handleFriendAction}
                       friendBusy={friendBusy}
                       onOpenAuth={() => setAuthModalMode("login")}
-                      onOpenFreeGame={() => openFreeGame(setToastMessage)}
+                      onOpenFreeGame={handleOpenFreeGame}
                       onLogout={handleLogout}
                     />
                   )}

@@ -39,7 +39,7 @@ router.patch(
         username
       })
       .eq("id", request.authUser.id)
-      .select("id, email, username, avatar_url, created_at, updated_at, last_login_at")
+      .select("id, email, username, display_name, avatar_url, created_at, updated_at, last_login_at, last_seen_at")
       .single();
 
     if (error) {

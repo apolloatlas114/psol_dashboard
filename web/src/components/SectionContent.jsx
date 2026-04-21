@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import {
   Activity,
   ArrowRightLeft,
@@ -9,7 +10,6 @@ import {
   Gift,
   Heart,
   Search,
-  Send,
   Share2,
   ShieldCheck,
   Sparkles,
@@ -20,6 +20,7 @@ import {
   Wallet
 } from "lucide-react";
 import { formatCurrency, formatDuration, formatNumber } from "../lib/formatters.js";
+import { marketplaceSkinCatalog } from "./marketplace-skins.js";
 
 function clampChartValue(value, max) {
   if (!max || max <= 0) {
@@ -652,31 +653,51 @@ function SkinTile({ title, status, meta, rarity }) {
   );
 }
 
+function normalizeSkinName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\.png$/i, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function prettifySkinName(value) {
+  const normalized = String(value || "")
+    .replace(/\.png$/i, "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return normalized
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function parseUsdPrice(value) {
+  const numeric = Number.parseFloat(String(value || "").replace(/[^\d.]/g, ""));
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
 function MarketplaceTile({ item }) {
   return (
     <article className="showcase-market-card">
       <div className="market-skin-border" />
-      <div className={`market-skin-stage rarity-${item.rarity || "common"}`}>
+      <div className="market-skin-stage">
         <img className="market-skin-image image" src={item.image} alt={item.name} />
       </div>
-      <div className="showcase-market-copy market-skin-copy">
-        <strong className="showcase-skin-title market-skin-heading">{item.name}</strong>
-        <ul className="showcase-market-bullets">
-          {item.bullets.map((bullet) => (
-            <li key={bullet}>{bullet}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="showcase-skin-social">
-        <button type="button" className="showcase-icon-button" aria-label="Like market item">
-          <Heart size={14} />
-        </button>
-        <button type="button" className="showcase-icon-button" aria-label="Share market item">
-          <Share2 size={14} />
-        </button>
-        <button type="button" className="showcase-icon-button" aria-label="Send market item">
-          <Send size={14} />
-        </button>
+      <div className="showcase-market-meta-row">
+        <div className="showcase-market-copy market-skin-copy">
+          <strong className="showcase-skin-title market-skin-heading">{item.name}</strong>
+          <span className={`market-rarity market-rarity-${item.rarity || "common"}`}>{item.rarity}</span>
+        </div>
+        <div className="showcase-skin-social">
+          <button type="button" className="showcase-icon-button" aria-label="Like market item">
+            <Heart size={20} />
+          </button>
+          <button type="button" className="showcase-icon-button" aria-label="Share market item">
+            <Share2 size={20} />
+          </button>
+        </div>
       </div>
       <div className="showcase-market-footer">
         <div className="showcase-market-price">
@@ -775,112 +796,108 @@ export function SectionContent({
     rarity: item.rarity || "common"
   }));
 
-  const marketFallbackItems = [
-    {
-      id: "m1",
-      name: "Alien Donut",
-      rarity: "epic",
-      bullets: ["Epic", "Tradable", "Hover SFX"],
-      price: "$2.40",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/alien-donut.svg"
-    },
-    {
-      id: "m2",
-      name: "Slime Orb",
-      rarity: "rare",
-      bullets: ["Rare", "Animated Glow", "Loop ambience"],
-      price: "$1.85",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/slime-orb.svg"
-    },
-    {
-      id: "m3",
-      name: "Void Core",
-      rarity: "rare",
-      bullets: ["Rare", "Tradable", "Low supply"],
-      price: "$1.65",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/void-core.svg"
-    },
-    {
-      id: "m4",
-      name: "Neon Horn",
-      rarity: "epic",
-      bullets: ["Epic", "Animated Idle", "Hit ping"],
-      price: "$2.10",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/neon-horn.svg"
-    },
-    {
-      id: "m5",
-      name: "Donut Prime",
-      rarity: "epic",
-      bullets: ["Epic", "Tradable", "Portal hum"],
-      price: "$2.95",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/alien-donut.svg"
-    },
-    {
-      id: "m6",
-      name: "Orb Flux",
-      rarity: "rare",
-      bullets: ["Rare", "Animated Glow", "Soft spark"],
-      price: "$1.55",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/slime-orb.svg"
-    },
-    {
-      id: "m7",
-      name: "Core Rift",
-      rarity: "common",
-      bullets: ["Common", "Tradable", "Clean idle"],
-      price: "$0.95",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/void-core.svg"
-    },
-    {
-      id: "m8",
-      name: "Horn Nova",
-      rarity: "rare",
-      bullets: ["Rare", "Impact SFX", "Browser Wallet"],
-      price: "$1.35",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/neon-horn.svg"
-    },
-    {
-      id: "m9",
-      name: "Alien Bloom",
-      rarity: "epic",
-      bullets: ["Epic", "Tradable", "Glow pulse"],
-      price: "$2.70",
-      status: "Listed",
-      action: "Buy now",
-      image: "/skins/alien-donut.svg"
-    }
-  ];
+  const [marketSearch, setMarketSearch] = useState("");
+  const [marketSort, setMarketSort] = useState("featured");
+  const [marketRarity, setMarketRarity] = useState("all");
+  const [marketPriceBand, setMarketPriceBand] = useState("all");
+  const [marketMode, setMarketMode] = useState("buy");
 
-  const marketImages = ["/skins/alien-donut.svg", "/skins/slime-orb.svg", "/skins/void-core.svg", "/skins/neon-horn.svg"];
-  const marketItems = inventoryTiles.length
-    ? inventoryTiles.map((item, index) => ({
-        id: `owned-market-${item.id}`,
-        name: item.title,
-        rarity: item.rarity,
-        bullets: [item.status, item.meta || "Owned", index % 2 === 0 ? "Tradable" : "Equip-ready"],
-        price: ["$1.15", "$1.40", "$1.75", "$2.10"][index % 4],
-        status: "Listed",
-        action: "Buy now",
-        image: marketImages[index % marketImages.length]
-      }))
-    : marketFallbackItems;
+  const marketCatalogByName = useMemo(() => {
+    const entries = marketplaceSkinCatalog.map((item) => [normalizeSkinName(item.name), item]);
+    return new Map(entries);
+  }, []);
+
+  const sellItems = useMemo(() => {
+    return inventory.items
+      .filter((item) => item.item_type === "skin" || item.item_type === "skins" || String(item.item_key || "").toLowerCase().includes("skin"))
+      .map((item, index) => {
+        const rawKey = String(item.catalog_item_id || item.item_key || item.id || "");
+        const normalized = normalizeSkinName(rawKey);
+        const catalogMatch =
+          marketCatalogByName.get(normalized) ||
+          marketCatalogByName.get(normalizeSkinName(prettifySkinName(rawKey)));
+        const fallbackPrice = `${Math.max(1, Math.min(200, 25 + index * 3))} USD`;
+        return {
+          id: `sell-${item.id ?? index}`,
+          name: catalogMatch?.name || prettifySkinName(rawKey) || `Owned Skin ${index + 1}`,
+          rarity: String(item.rarity || catalogMatch?.rarity || "common").toLowerCase(),
+          price: catalogMatch?.price || fallbackPrice,
+          status: item.quantity > 1 ? `Owned x${item.quantity}` : "Owned",
+          action: "List now",
+          image: catalogMatch?.image || "/skins-market/alienemoji-market.png"
+        };
+      });
+  }, [inventory.items, marketCatalogByName]);
+
+  const marketItems = useMemo(() => {
+    const sourceItems = marketMode === "sell" ? sellItems : marketplaceSkinCatalog;
+    const searchNeedle = marketSearch.trim().toLowerCase();
+
+    const filtered = sourceItems.filter((item) => {
+      const priceValue = parseUsdPrice(item.price);
+      const matchesSearch = !searchNeedle
+        || String(item.name || "").toLowerCase().includes(searchNeedle)
+        || String(item.rarity || "").toLowerCase().includes(searchNeedle)
+        || String(item.price || "").toLowerCase().includes(searchNeedle);
+      const matchesRarity = marketRarity === "all" || String(item.rarity || "").toLowerCase() === marketRarity;
+      const matchesPriceBand = marketPriceBand === "all"
+        || (marketPriceBand === "low" && priceValue < 50)
+        || (marketPriceBand === "mid" && priceValue >= 50 && priceValue <= 120)
+        || (marketPriceBand === "high" && priceValue > 120);
+      return matchesSearch && matchesRarity && matchesPriceBand;
+    });
+
+    const sorted = [...filtered];
+    if (marketSort === "price-asc") {
+      sorted.sort((a, b) => parseUsdPrice(a.price) - parseUsdPrice(b.price));
+    } else if (marketSort === "price-desc") {
+      sorted.sort((a, b) => parseUsdPrice(b.price) - parseUsdPrice(a.price));
+    } else if (marketSort === "name") {
+      sorted.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    }
+
+    return sorted;
+  }, [marketMode, sellItems, marketSearch, marketRarity, marketPriceBand, marketSort]);
+
+  const nextSort = () => {
+    setMarketSort((current) => (
+      current === "featured"
+        ? "price-asc"
+        : current === "price-asc"
+          ? "price-desc"
+          : current === "price-desc"
+            ? "name"
+            : "featured"
+    ));
+  };
+
+  const nextRarity = () => {
+    const order = ["all", "common", "uncommon", "rare", "epic", "legendary"];
+    setMarketRarity((current) => order[(order.indexOf(current) + 1) % order.length]);
+  };
+
+  const nextPriceBand = () => {
+    const order = ["all", "low", "mid", "high"];
+    setMarketPriceBand((current) => order[(order.indexOf(current) + 1) % order.length]);
+  };
+
+  const sortLabel = marketSort === "featured"
+    ? "Sort: Featured"
+    : marketSort === "price-asc"
+      ? "Sort: Price up"
+      : marketSort === "price-desc"
+        ? "Sort: Price down"
+        : "Sort: Name";
+  const rarityLabel = marketRarity === "all"
+    ? "Rarity: All"
+    : `Rarity: ${prettifySkinName(marketRarity)}`;
+  const priceLabel = marketPriceBand === "all"
+    ? "Price: All"
+    : marketPriceBand === "low"
+      ? "Price: < 50"
+      : marketPriceBand === "mid"
+        ? "Price: 50 - 120"
+        : "Price: > 120";
 
   if (activeSection === "play") {
     return (
@@ -979,22 +996,35 @@ export function SectionContent({
         <div className="market-toolbar">
           <label className="market-toolbar-field fx-glass-input">
             <Search size={14} />
-            <input placeholder="Search skin" readOnly value="" />
+            <input
+              placeholder={marketMode === "buy" ? "Search skin" : "Search owned skin"}
+              value={marketSearch}
+              onChange={(event) => setMarketSearch(event.target.value)}
+            />
           </label>
-          <button type="button" className="market-chip fx-glass-chip">Sort by price</button>
-          <button type="button" className="market-chip fx-glass-chip">Filter rarity</button>
-          <button type="button" className="market-chip fx-glass-chip">Filter price</button>
+          <button type="button" className="market-chip fx-glass-chip" onClick={nextSort}>{sortLabel}</button>
+          <button type="button" className="market-chip fx-glass-chip" onClick={nextRarity}>{rarityLabel}</button>
+          <button type="button" className="market-chip fx-glass-chip" onClick={nextPriceBand}>{priceLabel}</button>
           <div className="market-toggle fx-toggle-group">
-            <button type="button" className="active">Buy</button>
-            <button type="button">Sell</button>
+            <button type="button" className={marketMode === "buy" ? "active" : ""} onClick={() => setMarketMode("buy")}>Buy</button>
+            <button type="button" className={marketMode === "sell" ? "active" : ""} onClick={() => setMarketMode("sell")}>Sell</button>
           </div>
         </div>
 
-        <div className="market-grid">
-          {marketItems.map((item) => (
-            <MarketplaceTile key={item.id} item={item} />
-          ))}
-        </div>
+        {marketItems.length ? (
+          <div className="market-grid">
+            {marketItems.map((item) => (
+              <MarketplaceTile key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <EmptyPanel
+            title={marketMode === "buy" ? "Keine Marketplace-Treffer" : "Keine Sell-Skins"}
+            copy={marketMode === "buy"
+              ? "Suche oder Filter haben aktuell keine passenden Skins gefunden."
+              : "Im aktuellen Inventar passt noch keine Skin zu diesem Filter."}
+          />
+        )}
       </section>
     );
   }
